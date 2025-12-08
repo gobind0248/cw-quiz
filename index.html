@@ -305,14 +305,15 @@
         <option value="">-- Choose Topic --</option>
         <option value="icf">1. ICF Coach</option>
         <option value="icfbr">2. ICF Brake & Schedules</option>
-        <option value="lhb">3. LHB / FIAT / Hybrid</option>
-        <option value="wagon">4. Wagon & Bogies</option>
-        <option value="wheel">5. Wheel / Axle / Limits</option>
-        <option value="cbc">6. Coupler & Draft Gear</option>
-        <option value="brake">7. Brake System (General)</option>
+        <option value="brake">3. Brake System (General)</option>
+        <option value="lhb">4. LHB / FIAT / Hybrid</option>
+        <option value="wagon">5. Wagon & Bogies</option>
+        <option value="wheel">6. Wheel / Axle / Limits</option>
+        <option value="cbc">7. Coupler & Draft Gear</option>
         <option value="track">8. Track & Accident Rules</option>
         <option value="wrk">9. Workshop / Schedule / Safety</option>
         <option value="nt">10. Non-Technical (Math / Reasoning / GA)</option>
+        <option value="mock">11. Mock Test</option>
       </select>
       <button class="start-btn" id="start-btn">Start Quiz</button>
     </div>
@@ -343,7 +344,7 @@
     </div>
 
     <div class="hint">
-      Tip: Maintain each tab with columns: Question, Option1–4, Correct (1–4 or A–D).
+      Tip: In each sheet keep columns: Question, Option1–4, Correct (1–4).
     </div>
   </div>
 
@@ -359,6 +360,10 @@
       icfbr: {
         name: "ICF Brake & Schedules",
         url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=264887129`
+      },
+      brake: {
+        name: "Brake System (General)",
+        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=265201723`
       },
       lhb: {
         name: "LHB / FIAT / Hybrid",
@@ -376,10 +381,6 @@
         name: "Coupler & Draft Gear",
         url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=209950154`
       },
-      brake: {
-        name: "Brake System (General)",
-        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=265201723`
-      },
       track: {
         name: "Track & Accident Rules",
         url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=871729689`
@@ -391,6 +392,10 @@
       nt: {
         name: "Non-Technical (Math / Reasoning / GA)",
         url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=2066648063`
+      },
+      mock: {
+        name: "Mock Test",
+        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=770400940`
       }
     };
 
