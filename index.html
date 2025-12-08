@@ -249,11 +249,16 @@
       background: #1f2937;
       color: #e5e7eb;
       border: 1px solid rgba(75, 85, 99, 0.8);
-      display: none;
+      display: inline-block; /* always visible for skip */
     }
 
-    #next-btn:hover {
+    #next-btn:hover:enabled {
       background: #111827;
+    }
+
+    #next-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     .score-box {
@@ -273,13 +278,6 @@
 
     .final-score strong {
       color: #22c55e;
-    }
-
-    .hint {
-      font-size: 0.8rem;
-      color: #9ca3af;
-      margin-top: 6px;
-      text-align: right;
     }
 
     @media (max-width: 700px) {
@@ -336,15 +334,11 @@
 
     <div class="controls">
       <button id="submit-btn" disabled>Submit</button>
-      <button id="next-btn">Next Question ➜</button>
+      <button id="next-btn" disabled>Next Question ➜</button>
     </div>
 
     <div class="score-box">
       <div id="final-score" class="final-score" style="display:none;"></div>
-    </div>
-
-    <div class="hint">
-      Tip: In each sheet keep columns: Question, Option1–4, Correct (1–4).
     </div>
   </div>
 
@@ -457,7 +451,7 @@
         questionTextEl.textContent = "No questions available. Check your Google Sheet.";
         optionsListEl.innerHTML = "";
         submitBtn.disabled = true;
-        nextBtn.style.display = "none";
+        nextBtn.disabled = true;
         return;
       }
 
@@ -473,6 +467,7 @@
 
       questionTextEl.textContent = q.question;
       optionsListEl.innerHTML = "";
+
       q.options.forEach((opt, idx) => {
         const li = document.createElement("li");
         li.className = "option";
@@ -490,11 +485,17 @@
         li.appendChild(input);
         li.appendChild(label);
         optionsListEl.appendChild(li);
+
+        // Make entire option row clickable
+        li.addEventListener("click", () => {
+          const radio = li.querySelector("input");
+          if (radio) radio.checked = true;
+        });
       });
 
       submitBtn.disabled = false;
       submitBtn.textContent = "Submit";
-      nextBtn.style.display = "none";
+      nextBtn.disabled = false; // can be used to skip
     }
 
     function getSelectedOptionIndex() {
@@ -526,6 +527,34 @@
       });
     }
 
+    function goToNextQuestion() {
+      currentIndex++;
+      if (currentIndex < questions.length) {
+        renderQuestion();
+      } else {
+        progressBarFillEl.style.width = "100%";
+        questionTextEl.textContent = "Quiz Completed!";
+        optionsListEl.innerHTML = "";
+        feedbackEl.textContent = "";
+        submitBtn.style.display = "none";
+        nextBtn.style.display = "none";
+        finalScoreEl.style.display = "block";
+        finalScoreEl.innerHTML = `
+          <strong>Result:</strong> You scored <strong>${score}</strong> out of <strong>${questions.length}</strong>.<br/>
+          Each question = 1 mark.<br/><br/>
+          <button id="restart-btn">Restart Same Topic</button>
+        `;
+        document.getElementById("restart-btn").onclick = () => {
+          score = 0;
+          currentIndex = 0;
+          scoreMiniEl.textContent = "Score: 0";
+          submitBtn.style.display = "inline-block";
+          nextBtn.style.display = "inline-block";
+          renderQuestion();
+        };
+      }
+    }
+
     submitBtn.addEventListener("click", () => {
       if (!questionsLoaded || hasAnswered) return;
 
@@ -550,36 +579,22 @@
       scoreMiniEl.textContent = `Score: ${score}`;
       showCorrectness(selectedIndex);
       lockOptions();
-
       submitBtn.disabled = true;
-      nextBtn.style.display = "inline-block";
+
+      if (selectedIndex === q.correctIndex) {
+        // correct → auto-jump to next question
+        nextBtn.disabled = true; // avoid double click
+        setTimeout(() => {
+          nextBtn.disabled = false;
+          goToNextQuestion();
+        }, 700);
+      }
+      // wrong → user uses Next to move or can skip
     });
 
     nextBtn.addEventListener("click", () => {
-      currentIndex++;
-      if (currentIndex < questions.length) {
-        renderQuestion();
-      } else {
-        progressBarFillEl.style.width = "100%";
-        questionTextEl.textContent = "Quiz Completed!";
-        optionsListEl.innerHTML = "";
-        feedbackEl.textContent = "";
-        submitBtn.style.display = "none";
-        nextBtn.style.display = "none";
-        finalScoreEl.style.display = "block";
-        finalScoreEl.innerHTML = `
-          <strong>Result:</strong> You scored <strong>${score}</strong> out of <strong>${questions.length}</strong>.<br/>
-          Each question = 1 mark.<br/><br/>
-          <button id="restart-btn">Restart Same Topic</button>
-        `;
-        document.getElementById("restart-btn").onclick = () => {
-          score = 0;
-          currentIndex = 0;
-          scoreMiniEl.textContent = "Score: 0";
-          submitBtn.style.display = "inline-block";
-          renderQuestion();
-        };
-      }
+      // Next works for skip (no answer) or after wrong
+      goToNextQuestion();
     });
 
     async function loadQuestionsForTopic(topicKey) {
@@ -591,7 +606,7 @@
         optionsListEl.innerHTML = "";
         feedbackEl.textContent = "";
         submitBtn.disabled = true;
-        nextBtn.style.display = "none";
+        nextBtn.disabled = true;
         finalScoreEl.style.display = "none";
         progressBarFillEl.style.width = "0%";
         questionCounterEl.textContent = "Loading…";
@@ -612,11 +627,14 @@
         currentIndex = 0;
         score = 0;
         scoreMiniEl.textContent = "Score: 0";
+        submitBtn.style.display = "inline-block";
+        nextBtn.style.display = "inline-block";
         renderQuestion();
       } catch (err) {
         console.error(err);
         questionTextEl.textContent = "Error loading questions. Check CSV link, sharing & internet.";
         submitBtn.disabled = true;
+        nextBtn.disabled = true;
       }
     }
 
