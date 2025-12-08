@@ -249,7 +249,7 @@
       background: #1f2937;
       color: #e5e7eb;
       border: 1px solid rgba(75, 85, 99, 0.8);
-      display: inline-block; /* always visible for skip */
+      display: inline-block;
     }
 
     #next-btn:hover:enabled {
@@ -413,6 +413,15 @@
     const startBtnEl        = document.getElementById("start-btn");
     const topicBadgeEl      = document.getElementById("current-topic-badge");
 
+    // ---------- Helpers: shuffle + randomize bank ----------
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+
     function parseCSV(text) {
       const lines = text.trim().split("\n");
       const result = [];
@@ -445,6 +454,29 @@
       }
       return result;
     }
+
+    function prepareQuestionBank(rawQuestions) {
+      const qs = rawQuestions.map(q => ({
+        question: q.question,
+        options: [...q.options],
+        correctIndex: q.correctIndex
+      }));
+
+      shuffleArray(qs);
+
+      qs.forEach(q => {
+        const idxs = [0, 1, 2, 3];
+        shuffleArray(idxs);
+        const newOptions = idxs.map(i => q.options[i]);
+        const newCorrectIndex = idxs.indexOf(q.correctIndex);
+        q.options = newOptions;
+        q.correctIndex = newCorrectIndex;
+      });
+
+      return qs;
+    }
+
+    // ---------- UI rendering ----------
 
     function renderQuestion() {
       if (!questionsLoaded || questions.length === 0) {
@@ -486,7 +518,6 @@
         li.appendChild(label);
         optionsListEl.appendChild(li);
 
-        // Make entire option row clickable
         li.addEventListener("click", () => {
           const radio = li.querySelector("input");
           if (radio) radio.checked = true;
@@ -495,7 +526,7 @@
 
       submitBtn.disabled = false;
       submitBtn.textContent = "Submit";
-      nextBtn.disabled = false; // can be used to skip
+      nextBtn.disabled = false;
     }
 
     function getSelectedOptionIndex() {
@@ -514,356 +545,142 @@
         if (input) input.disabled = true;
       });
     }
-<script>
-  // ========= CONFIG: Your Sheet & Topics =========
-  const BASE_ID = "1hJSzOmZZilf3XR4SxlM-s_xPoq-4KkQKJ9vF8TGxSn4";
 
-  const TOPICS = {
-    icf: {
-      name: "ICF Coach",
-      url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=0`
-    },
-    icfbr: {
-      name: "ICF Brake & Schedules",
-      url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=264887129`
-    },
-    brake: {
-      name: "Brake System (General)",
-      url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=265201723`
-    },
-    lhb: {
-      name: "LHB / FIAT / Hybrid",
-      url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=567109127`
-    },
-    wagon: {
-      name: "Wagon & Bogies",
-      url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=1900017436`
-    },
-    wheel: {
-      name: "Wheel / Axle / Limits",
-      url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=978447235`
-    },
-    cbc: {
-      name: "Coupler & Draft Gear",
-      url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=209950154`
-    },
-    track: {
-      name: "Track & Accident Rules",
-      url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=871729689`
-    },
-    wrk: {
-      name: "Workshop / Schedule / Safety",
-      url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=1894868920`
-    },
-    nt: {
-      name: "Non-Technical (Math / Reasoning / GA)",
-      url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=2066648063`
-    },
-    mock: {
-      name: "Mock Test",
-      url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=770400940`
+    function showCorrectness(selectedIndex) {
+      const q = questions[currentIndex];
+      const optionEls = document.querySelectorAll(".option");
+      optionEls.forEach((optEl, idx) => {
+        optEl.classList.remove("correct", "incorrect");
+        if (idx === q.correctIndex) optEl.classList.add("correct");
+        if (idx === selectedIndex && selectedIndex !== q.correctIndex) {
+          optEl.classList.add("incorrect");
+        }
+      });
     }
-  };
 
-  let questions = [];
-  let currentIndex = 0;
-  let score = 0;
-  let hasAnswered = false;
-  let questionsLoaded = false;
-  let currentTopicKey = null;
-
-  const questionTextEl    = document.getElementById("question-text");
-  const optionsListEl     = document.getElementById("options-list");
-  const feedbackEl        = document.getElementById("feedback");
-  const submitBtn         = document.getElementById("submit-btn");
-  const nextBtn           = document.getElementById("next-btn");
-  const questionCounterEl = document.getElementById("question-counter");
-  const progressBarFillEl = document.getElementById("progress-bar-fill");
-  const scoreMiniEl       = document.getElementById("score-mini");
-  const finalScoreEl      = document.getElementById("final-score");
-  const topicSelectEl     = document.getElementById("topic-select");
-  const startBtnEl        = document.getElementById("start-btn");
-  const topicBadgeEl      = document.getElementById("current-topic-badge");
-
-  // ---------- Helpers: shuffle + randomize bank ----------
-
-  // Fisher–Yates shuffle (in-place)
-  function shuffleArray(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
-  }
-
-  // Parse raw CSV to structured questions
-  function parseCSV(text) {
-    const lines = text.trim().split("\n");
-    const result = [];
-    if (lines.length <= 1) return result;
-
-    for (let i = 1; i < lines.length; i++) {
-      const row = lines[i].split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
-      if (row.length < 6) continue;
-
-      const q   = row[0].replace(/^"|"$/g, "").trim();
-      const o1  = row[1].replace(/^"|"$/g, "").trim();
-      const o2  = row[2].replace(/^"|"$/g, "").trim();
-      const o3  = row[3].replace(/^"|"$/g, "").trim();
-      const o4  = row[4].replace(/^"|"$/g, "").trim();
-      const raw = row[5].replace(/^"|"$/g, "").trim();
-
-      let correctIndex = 0;
-      if (/^[1-4]$/.test(raw)) {
-        correctIndex = parseInt(raw, 10) - 1;
+    function goToNextQuestion() {
+      currentIndex++;
+      if (currentIndex < questions.length) {
+        renderQuestion();
       } else {
-        const map = { A:0, B:1, C:2, D:3 };
-        correctIndex = map[raw.toUpperCase()] ?? 0;
+        progressBarFillEl.style.width = "100%";
+        questionTextEl.textContent = "Quiz Completed!";
+        optionsListEl.innerHTML = "";
+        feedbackEl.textContent = "";
+        submitBtn.style.display = "none";
+        nextBtn.style.display = "none";
+        finalScoreEl.style.display = "block";
+        finalScoreEl.innerHTML = `
+          <strong>Result:</strong> You scored <strong>${score}</strong> out of <strong>${questions.length}</strong>.<br/>
+          Each question = 1 mark.<br/><br/>
+          <button id="restart-btn">Restart Same Topic</button>
+        `;
+        document.getElementById("restart-btn").onclick = () => {
+          score = 0;
+          currentIndex = 0;
+          scoreMiniEl.textContent = "Score: 0";
+          submitBtn.style.display = "inline-block";
+          nextBtn.style.display = "inline-block";
+          renderQuestion();
+        };
+      }
+    }
+
+    // ---------- Events ----------
+
+    submitBtn.addEventListener("click", () => {
+      if (!questionsLoaded || hasAnswered) return;
+
+      const selectedIndex = getSelectedOptionIndex();
+      if (selectedIndex === -1) {
+        alert("Please select an option before submitting.");
+        return;
       }
 
-      result.push({
-        question: q,
-        options: [o1, o2, o3, o4],
-        correctIndex
-      });
-    }
-    return result;
-  }
+      const q = questions[currentIndex];
+      hasAnswered = true;
 
-  // Take parsed questions, randomize question order and options
-  function prepareQuestionBank(rawQuestions) {
-    // deep(ish) copy
-    const qs = rawQuestions.map(q => ({
-      question: q.question,
-      options: [...q.options],
-      correctIndex: q.correctIndex
-    }));
+      if (selectedIndex === q.correctIndex) {
+        score++;
+        feedbackEl.textContent = "✅ Correct!";
+        feedbackEl.className = "feedback correct";
+      } else {
+        feedbackEl.textContent = `❌ Wrong. Correct answer: ${q.options[q.correctIndex]}`;
+        feedbackEl.className = "feedback incorrect";
+      }
 
-    // 1) shuffle question order
-    shuffleArray(qs);
-
-    // 2) shuffle options inside each question but keep correctIndex right
-    qs.forEach(q => {
-      const idxs = [0, 1, 2, 3];
-      shuffleArray(idxs);
-      const newOptions = idxs.map(i => q.options[i]);
-      const newCorrectIndex = idxs.indexOf(q.correctIndex);
-      q.options = newOptions;
-      q.correctIndex = newCorrectIndex;
-    });
-
-    return qs;
-  }
-
-  // ---------- UI rendering ----------
-
-  function renderQuestion() {
-    if (!questionsLoaded || questions.length === 0) {
-      questionTextEl.textContent = "No questions available. Check your Google Sheet.";
-      optionsListEl.innerHTML = "";
+      scoreMiniEl.textContent = `Score: ${score}`;
+      showCorrectness(selectedIndex);
+      lockOptions();
       submitBtn.disabled = true;
-      nextBtn.disabled = true;
-      return;
-    }
 
-    const q = questions[currentIndex];
-    hasAnswered = false;
-    feedbackEl.textContent = "";
-    feedbackEl.className = "feedback";
-    finalScoreEl.style.display = "none";
-
-    questionCounterEl.textContent = `Question ${currentIndex + 1} / ${questions.length}`;
-    const progressPercent = (currentIndex / questions.length) * 100;
-    progressBarFillEl.style.width = `${progressPercent}%`;
-
-    questionTextEl.textContent = q.question;
-    optionsListEl.innerHTML = "";
-
-    q.options.forEach((opt, idx) => {
-      const li = document.createElement("li");
-      li.className = "option";
-
-      const input = document.createElement("input");
-      input.type = "radio";
-      input.name = "option";
-      input.value = idx;
-      input.id = `opt-${idx}`;
-
-      const label = document.createElement("label");
-      label.setAttribute("for", `opt-${idx}`);
-      label.textContent = opt;
-
-      li.appendChild(input);
-      li.appendChild(label);
-      optionsListEl.appendChild(li);
-
-      // Make entire option row clickable
-      li.addEventListener("click", () => {
-        const radio = li.querySelector("input");
-        if (radio) radio.checked = true;
-      });
-    });
-
-    submitBtn.disabled = false;
-    submitBtn.textContent = "Submit";
-    nextBtn.disabled = false; // can always skip
-  }
-
-  function getSelectedOptionIndex() {
-    const radios = document.querySelectorAll("input[name='option']");
-    for (let r of radios) {
-      if (r.checked) return parseInt(r.value, 10);
-    }
-    return -1;
-  }
-
-  function lockOptions() {
-    const optionEls = document.querySelectorAll(".option");
-    optionEls.forEach(opt => {
-      opt.classList.add("disabled");
-      const input = opt.querySelector("input");
-      if (input) input.disabled = true;
-    });
-  }
-
-  function showCorrectness(selectedIndex) {
-    const q = questions[currentIndex];
-    const optionEls = document.querySelectorAll(".option");
-    optionEls.forEach((optEl, idx) => {
-      optEl.classList.remove("correct", "incorrect");
-      if (idx === q.correctIndex) optEl.classList.add("correct");
-      if (idx === selectedIndex && selectedIndex !== q.correctIndex) {
-        optEl.classList.add("incorrect");
+      if (selectedIndex === q.correctIndex) {
+        nextBtn.disabled = true;
+        setTimeout(() => {
+          nextBtn.disabled = false;
+          goToNextQuestion();
+        }, 700);
       }
+      // wrong → user presses Next to move on
     });
-  }
 
-  function goToNextQuestion() {
-    currentIndex++;
-    if (currentIndex < questions.length) {
-      renderQuestion();
-    } else {
-      // quiz finished
-      progressBarFillEl.style.width = "100%";
-      questionTextEl.textContent = "Quiz Completed!";
-      optionsListEl.innerHTML = "";
-      feedbackEl.textContent = "";
-      submitBtn.style.display = "none";
-      nextBtn.style.display = "none";
-      finalScoreEl.style.display = "block";
-      finalScoreEl.innerHTML = `
-        <strong>Result:</strong> You scored <strong>${score}</strong> out of <strong>${questions.length}</strong>.<br/>
-        Each question = 1 mark.<br/><br/>
-        <button id="restart-btn">Restart Same Topic</button>
-      `;
-      document.getElementById("restart-btn").onclick = () => {
-        score = 0;
+    nextBtn.addEventListener("click", () => {
+      goToNextQuestion(); // works as skip or after wrong
+    });
+
+    async function loadQuestionsForTopic(topicKey) {
+      const topic = TOPICS[topicKey];
+      if (!topic) return;
+
+      try {
+        questionTextEl.textContent = "Loading questions from Google Sheet…";
+        optionsListEl.innerHTML = "";
+        feedbackEl.textContent = "";
+        submitBtn.disabled = true;
+        nextBtn.disabled = true;
+        finalScoreEl.style.display = "none";
+        progressBarFillEl.style.width = "0%";
+        questionCounterEl.textContent = "Loading…";
+
+        const res = await fetch(topic.url);
+        if (!res.ok) throw new Error("Network error");
+        const text = await res.text();
+        const parsed = parseCSV(text);
+
+        if (parsed.length === 0) {
+          questionTextEl.textContent = "No questions found in this sheet.";
+          questionsLoaded = false;
+          return;
+        }
+
+        questions = prepareQuestionBank(parsed); // random order + random options
+
+        questionsLoaded = true;
         currentIndex = 0;
+        score = 0;
         scoreMiniEl.textContent = "Score: 0";
         submitBtn.style.display = "inline-block";
         nextBtn.style.display = "inline-block";
         renderQuestion();
-      };
-    }
-  }
-
-  // ---------- Events ----------
-
-  submitBtn.addEventListener("click", () => {
-    if (!questionsLoaded || hasAnswered) return;
-
-    const selectedIndex = getSelectedOptionIndex();
-    if (selectedIndex === -1) {
-      alert("Please select an option before submitting.");
-      return;
+      } catch (err) {
+        console.error(err);
+        questionTextEl.textContent = "Error loading questions. Check CSV link, sharing & internet.";
+        submitBtn.disabled = true;
+        nextBtn.disabled = true;
+      }
     }
 
-    const q = questions[currentIndex];
-    hasAnswered = true;
-
-    if (selectedIndex === q.correctIndex) {
-      score++;
-      feedbackEl.textContent = "✅ Correct!";
-      feedbackEl.className = "feedback correct";
-    } else {
-      feedbackEl.textContent = `❌ Wrong. Correct answer: ${q.options[q.correctIndex]}`;
-      feedbackEl.className = "feedback incorrect";
-    }
-
-    scoreMiniEl.textContent = `Score: ${score}`;
-    showCorrectness(selectedIndex);
-    lockOptions();
-    submitBtn.disabled = true;
-
-    if (selectedIndex === q.correctIndex) {
-      // correct → auto-jump
-      nextBtn.disabled = true;
-      setTimeout(() => {
-        nextBtn.disabled = false;
-        goToNextQuestion();
-      }, 700);
-    }
-    // wrong → user uses Next to move / skip
-  });
-
-  nextBtn.addEventListener("click", () => {
-    // works as skip or move after wrong
-    goToNextQuestion();
-  });
-
-  async function loadQuestionsForTopic(topicKey) {
-    const topic = TOPICS[topicKey];
-    if (!topic) return;
-
-    try {
-      questionTextEl.textContent = "Loading questions from Google Sheet…";
-      optionsListEl.innerHTML = "";
-      feedbackEl.textContent = "";
-      submitBtn.disabled = true;
-      nextBtn.disabled = true;
-      finalScoreEl.style.display = "none";
-      progressBarFillEl.style.width = "0%";
-      questionCounterEl.textContent = "Loading…";
-
-      const res = await fetch(topic.url);
-      if (!res.ok) throw new Error("Network error");
-      const text = await res.text();
-      const parsed = parseCSV(text);
-
-      if (parsed.length === 0) {
-        questionTextEl.textContent = "No questions found in this sheet.";
-        questionsLoaded = false;
+    startBtnEl.addEventListener("click", () => {
+      const key = topicSelectEl.value;
+      if (!key) {
+        alert("Please select a topic first.");
         return;
       }
-
-      // 🔥 randomize questions + options here
-      questions = prepareQuestionBank(parsed);
-
-      questionsLoaded = true;
-      currentIndex = 0;
-      score = 0;
-      scoreMiniEl.textContent = "Score: 0";
-      submitBtn.style.display = "inline-block";
-      nextBtn.style.display = "inline-block";
-      renderQuestion();
-    } catch (err) {
-      console.error(err);
-      questionTextEl.textContent = "Error loading questions. Check CSV link, sharing & internet.";
-      submitBtn.disabled = true;
-      nextBtn.disabled = true;
-    }
-  }
-
-  startBtnEl.addEventListener("click", () => {
-    const key = topicSelectEl.value;
-    if (!key) {
-      alert("Please select a topic first.");
-      return;
-    }
-    currentTopicKey = key;
-    const topic = TOPICS[key];
-    topicBadgeEl.textContent = topic ? topic.name : "Topic";
-    loadQuestionsForTopic(key);
-  });
-</script>
+      currentTopicKey = key;
+      const topic = TOPICS[key];
+      topicBadgeEl.textContent = topic ? topic.name : "Topic";
+      loadQuestionsForTopic(key);
+    });
+  </script>
 </body>
 </html>
