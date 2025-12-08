@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>C&W JE / LDCE Multi-Topic MCQ Practice-Created By Gobind Sharma</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .quiz-container {
+      background: #020617;
+      border-radius: 18px;
+      padding: 20px 22px;
+      max-width: 720px;
+      width: 100%;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .title {
+      font-size: 1.15rem;
+      font-weight: 600;
+      color: #e5e7eb;
+    }
+
+    .subtitle {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 2px;
+    }
+
+    .badge {
+      font-size: 0.78rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(59, 130, 246, 0.1);
+      color: #93c5fd;
+      border: 1px solid rgba(37, 99, 235, 0.5);
+      white-space: nowrap;
+      text-align: center;
+    }
+
+    .topic-select-row {
+      margin-bottom: 14px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .topic-select-row label {
+      font-size: 0.9rem;
+      color: #d1d5db;
+    }
+
+    select {
+      background: #020617;
+      color: #e5e7eb;
+      border-radius: 999px;
+      border: 1px solid rgba(75, 85, 99, 0.9);
+      padding: 6px 10px;
+      font-size: 0.9rem;
+      min-width: 220px;
+    }
+
+    .start-btn {
+      border-radius: 999px;
+      border: none;
+      padding: 8px 16px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      background: linear-gradient(to right, #3b82f6, #2563eb);
+      color: white;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.4);
+    }
+
+    .start-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.5);
+    }
+
+    .progress {
+      margin-bottom: 16px;
+      font-size: 0.85rem;
+      color: #9ca3af;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .progress-bar {
+      flex: 1;
+      height: 6px;
+      background: #111827;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(to right, #22c55e, #3b82f6);
+      transition: width 0.3s ease;
+    }
+
+    .question-box {
+      background: #020617;
+      border-radius: 14px;
+      padding: 14px 14px 10px;
+      border: 1px solid rgba(75, 85, 99, 0.7);
+      margin-bottom: 16px;
+      min-height: 140px;
+    }
+
+    .question-text {
+      font-size: 0.98rem;
+      font-weight: 500;
+      color: #f9fafb;
+      line-height: 1.5;
+    }
+
+    .options {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .option {
+      border-radius: 12px;
+      border: 1px solid rgba(75, 85, 99, 0.9);
+      padding: 8px 9px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
+      font-size: 0.92rem;
+      color: #e5e7eb;
+    }
+
+    .option:hover {
+      background: rgba(31, 41, 55, 0.9);
+      transform: translateY(-1px);
+    }
+
+    .option input {
+      cursor: pointer;
+      accent-color: #3b82f6;
+    }
+
+    .option.correct {
+      background: rgba(22, 163, 74, 0.18);
+      border-color: #22c55e;
+    }
+
+    .option.incorrect {
+      background: rgba(220, 38, 38, 0.12);
+      border-color: #f97373;
+    }
+
+    .option.disabled {
+      pointer-events: none;
+      opacity: 0.9;
+    }
+
+    .feedback {
+      min-height: 22px;
+      font-size: 0.9rem;
+      margin-top: 6px;
+    }
+
+    .feedback.correct {
+      color: #22c55e;
+    }
+
+    .feedback.incorrect {
+      color: #fb7185;
+    }
+
+    .controls {
+      margin-top: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    button {
+      transition: background 0.15s ease, transform 0.05s ease, box-shadow 0.1s ease;
+    }
+
+    #submit-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      background: linear-gradient(to right, #22c55e, #16a34a);
+      color: white;
+      box-shadow: 0 8px 18px rgba(34, 197, 94, 0.4);
+    }
+
+    #submit-btn:hover:enabled {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(34, 197, 94, 0.5);
+    }
+
+    #submit-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #next-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      background: #1f2937;
+      color: #e5e7eb;
+      border: 1px solid rgba(75, 85, 99, 0.8);
+      display: none;
+    }
+
+    #next-btn:hover {
+      background: #111827;
+    }
+
+    .score-box {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #e5e7eb;
+    }
+
+    .final-score {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(55, 65, 81, 0.8);
+      font-size: 0.95rem;
+    }
+
+    .final-score strong {
+      color: #22c55e;
+    }
+
+    .hint {
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-top: 6px;
+      text-align: right;
+    }
+
+    @media (max-width: 700px) {
+      .quiz-container {
+        margin: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <div class="quiz-header">
+      <div>
+        <div class="title">C&W JE / LDCE Multi-Topic MCQ Practice</div>
+        <div class="subtitle">Created By Gobind Sharma</div>
+      </div>
+      <div class="badge" id="current-topic-badge">No topic selected</div>
+    </div>
+
+    <div class="topic-select-row">
+      <label for="topic-select">Select Topic / Chapter:</label>
+      <select id="topic-select">
+        <option value="">-- Choose Topic --</option>
+        <option value="icf">1. ICF Coach</option>
+        <option value="icfbr">2. ICF Brake & Schedules</option>
+        <option value="lhb">3. LHB / FIAT / Hybrid</option>
+        <option value="wagon">4. Wagon & Bogies</option>
+        <option value="wheel">5. Wheel / Axle / Limits</option>
+        <option value="cbc">6. Coupler & Draft Gear</option>
+        <option value="brake">7. Brake System (General)</option>
+        <option value="track">8. Track & Accident Rules</option>
+        <option value="wrk">9. Workshop / Schedule / Safety</option>
+        <option value="nt">10. Non-Technical (Math / Reasoning / GA)</option>
+      </select>
+      <button class="start-btn" id="start-btn">Start Quiz</button>
+    </div>
+
+    <div class="progress">
+      <div id="question-counter">Select a topic and click Start Quiz</div>
+      <div class="progress-bar">
+        <div id="progress-bar-fill" class="progress-bar-fill"></div>
+      </div>
+      <div id="score-mini">Score: 0</div>
+    </div>
+
+    <div class="question-box">
+      <div id="question-text" class="question-text">
+        No topic selected. Please choose a topic and press "Start Quiz".
+      </div>
+      <ul id="options-list" class="options"></ul>
+      <div id="feedback" class="feedback"></div>
+    </div>
+
+    <div class="controls">
+      <button id="submit-btn" disabled>Submit</button>
+      <button id="next-btn">Next Question ➜</button>
+    </div>
+
+    <div class="score-box">
+      <div id="final-score" class="final-score" style="display:none;"></div>
+    </div>
+
+    <div class="hint">
+      Tip: Maintain each tab with columns: Question, Option1–4, Correct (1–4 or A–D).
+    </div>
+  </div>
+
+  <script>
+    // ========= CONFIG: Your Sheet & Topics =========
+    const BASE_ID = "1hJSzOmZZilf3XR4SxlM-s_xPoq-4KkQKJ9vF8TGxSn4";
+
+    const TOPICS = {
+      icf: {
+        name: "ICF Coach",
+        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=0`
+      },
+      icfbr: {
+        name: "ICF Brake & Schedules",
+        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=264887129`
+      },
+      lhb: {
+        name: "LHB / FIAT / Hybrid",
+        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=567109127`
+      },
+      wagon: {
+        name: "Wagon & Bogies",
+        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=1900017436`
+      },
+      wheel: {
+        name: "Wheel / Axle / Limits",
+        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=978447235`
+      },
+      cbc: {
+        name: "Coupler & Draft Gear",
+        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=209950154`
+      },
+      brake: {
+        name: "Brake System (General)",
+        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=265201723`
+      },
+      track: {
+        name: "Track & Accident Rules",
+        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=871729689`
+      },
+      wrk: {
+        name: "Workshop / Schedule / Safety",
+        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=1894868920`
+      },
+      nt: {
+        name: "Non-Technical (Math / Reasoning / GA)",
+        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=2066648063`
+      }
+    };
+
+    let questions = [];
+    let currentIndex = 0;
+    let score = 0;
+    let hasAnswered = false;
+    let questionsLoaded = false;
+    let currentTopicKey = null;
+
+    const questionTextEl    = document.getElementById("question-text");
+    const optionsListEl     = document.getElementById("options-list");
+    const feedbackEl        = document.getElementById("feedback");
+    const submitBtn         = document.getElementById("submit-btn");
+    const nextBtn           = document.getElementById("next-btn");
+    const questionCounterEl = document.getElementById("question-counter");
+    const progressBarFillEl = document.getElementById("progress-bar-fill");
+    const scoreMiniEl       = document.getElementById("score-mini");
+    const finalScoreEl      = document.getElementById("final-score");
+    const topicSelectEl     = document.getElementById("topic-select");
+    const startBtnEl        = document.getElementById("start-btn");
+    const topicBadgeEl      = document.getElementById("current-topic-badge");
+
+    function parseCSV(text) {
+      const lines = text.trim().split("\n");
+      const result = [];
+      if (lines.length <= 1) return result;
+
+      for (let i = 1; i < lines.length; i++) {
+        const row = lines[i].split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
+        if (row.length < 6) continue;
+
+        const q   = row[0].replace(/^"|"$/g, "").trim();
+        const o1  = row[1].replace(/^"|"$/g, "").trim();
+        const o2  = row[2].replace(/^"|"$/g, "").trim();
+        const o3  = row[3].replace(/^"|"$/g, "").trim();
+        const o4  = row[4].replace(/^"|"$/g, "").trim();
+        const raw = row[5].replace(/^"|"$/g, "").trim();
+
+        let correctIndex = 0;
+        if (/^[1-4]$/.test(raw)) {
+          correctIndex = parseInt(raw, 10) - 1;
+        } else {
+          const map = { A:0, B:1, C:2, D:3 };
+          correctIndex = map[raw.toUpperCase()] ?? 0;
+        }
+
+        result.push({
+          question: q,
+          options: [o1, o2, o3, o4],
+          correctIndex
+        });
+      }
+      return result;
+    }
+
+    function renderQuestion() {
+      if (!questionsLoaded || questions.length === 0) {
+        questionTextEl.textContent = "No questions available. Check your Google Sheet.";
+        optionsListEl.innerHTML = "";
+        submitBtn.disabled = true;
+        nextBtn.style.display = "none";
+        return;
+      }
+
+      const q = questions[currentIndex];
+      hasAnswered = false;
+      feedbackEl.textContent = "";
+      feedbackEl.className = "feedback";
+      finalScoreEl.style.display = "none";
+
+      questionCounterEl.textContent = `Question ${currentIndex + 1} / ${questions.length}`;
+      const progressPercent = (currentIndex / questions.length) * 100;
+      progressBarFillEl.style.width = `${progressPercent}%`;
+
+      questionTextEl.textContent = q.question;
+      optionsListEl.innerHTML = "";
+      q.options.forEach((opt, idx) => {
+        const li = document.createElement("li");
+        li.className = "option";
+
+        const input = document.createElement("input");
+        input.type = "radio";
+        input.name = "option";
+        input.value = idx;
+        input.id = `opt-${idx}`;
+
+        const label = document.createElement("label");
+        label.setAttribute("for", `opt-${idx}`);
+        label.textContent = opt;
+
+        li.appendChild(input);
+        li.appendChild(label);
+        optionsListEl.appendChild(li);
+      });
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Submit";
+      nextBtn.style.display = "none";
+    }
+
+    function getSelectedOptionIndex() {
+      const radios = document.querySelectorAll("input[name='option']");
+      for (let r of radios) {
+        if (r.checked) return parseInt(r.value, 10);
+      }
+      return -1;
+    }
+
+    function lockOptions() {
+      const optionEls = document.querySelectorAll(".option");
+      optionEls.forEach(opt => {
+        opt.classList.add("disabled");
+        const input = opt.querySelector("input");
+        if (input) input.disabled = true;
+      });
+    }
+
+    function showCorrectness(selectedIndex) {
+      const q = questions[currentIndex];
+      const optionEls = document.querySelectorAll(".option");
+      optionEls.forEach((optEl, idx) => {
+        optEl.classList.remove("correct", "incorrect");
+        if (idx === q.correctIndex) optEl.classList.add("correct");
+        if (idx === selectedIndex && selectedIndex !== q.correctIndex) {
+          optEl.classList.add("incorrect");
+        }
+      });
+    }
+
+    submitBtn.addEventListener("click", () => {
+      if (!questionsLoaded || hasAnswered) return;
+
+      const selectedIndex = getSelectedOptionIndex();
+      if (selectedIndex === -1) {
+        alert("Please select an option before submitting.");
+        return;
+      }
+
+      const q = questions[currentIndex];
+      hasAnswered = true;
+
+      if (selectedIndex === q.correctIndex) {
+        score++;
+        feedbackEl.textContent = "✅ Correct!";
+        feedbackEl.className = "feedback correct";
+      } else {
+        feedbackEl.textContent = `❌ Wrong. Correct answer: ${q.options[q.correctIndex]}`;
+        feedbackEl.className = "feedback incorrect";
+      }
+
+      scoreMiniEl.textContent = `Score: ${score}`;
+      showCorrectness(selectedIndex);
+      lockOptions();
+
+      submitBtn.disabled = true;
+      nextBtn.style.display = "inline-block";
+    });
+
+    nextBtn.addEventListener("click", () => {
+      currentIndex++;
+      if (currentIndex < questions.length) {
+        renderQuestion();
+      } else {
+        progressBarFillEl.style.width = "100%";
+        questionTextEl.textContent = "Quiz Completed!";
+        optionsListEl.innerHTML = "";
+        feedbackEl.textContent = "";
+        submitBtn.style.display = "none";
+        nextBtn.style.display = "none";
+        finalScoreEl.style.display = "block";
+        finalScoreEl.innerHTML = `
+          <strong>Result:</strong> You scored <strong>${score}</strong> out of <strong>${questions.length}</strong>.<br/>
+          Each question = 1 mark.<br/><br/>
+          <button id="restart-btn">Restart Same Topic</button>
+        `;
+        document.getElementById("restart-btn").onclick = () => {
+          score = 0;
+          currentIndex = 0;
+          scoreMiniEl.textContent = "Score: 0";
+          submitBtn.style.display = "inline-block";
+          renderQuestion();
+        };
+      }
+    });
+
+    async function loadQuestionsForTopic(topicKey) {
+      const topic = TOPICS[topicKey];
+      if (!topic) return;
+
+      try {
+        questionTextEl.textContent = "Loading questions from Google Sheet…";
+        optionsListEl.innerHTML = "";
+        feedbackEl.textContent = "";
+        submitBtn.disabled = true;
+        nextBtn.style.display = "none";
+        finalScoreEl.style.display = "none";
+        progressBarFillEl.style.width = "0%";
+        questionCounterEl.textContent = "Loading…";
+
+        const res = await fetch(topic.url);
+        if (!res.ok) throw new Error("Network error");
+        const text = await res.text();
+        const parsed = parseCSV(text);
+
+        if (parsed.length === 0) {
+          questionTextEl.textContent = "No questions found in this sheet.";
+          questionsLoaded = false;
+          return;
+        }
+
+        questions = parsed;
+        questionsLoaded = true;
+        currentIndex = 0;
+        score = 0;
+        scoreMiniEl.textContent = "Score: 0";
+        renderQuestion();
+      } catch (err) {
+        console.error(err);
+        questionTextEl.textContent = "Error loading questions. Check CSV link, sharing & internet.";
+        submitBtn.disabled = true;
+      }
+    }
+
+    startBtnEl.addEventListener("click", () => {
+      const key = topicSelectEl.value;
+      if (!key) {
+        alert("Please select a topic first.");
+        return;
+      }
+      currentTopicKey = key;
+      const topic = TOPICS[key];
+      topicBadgeEl.textContent = topic ? topic.name : "Topic";
+      loadQuestionsForTopic(key);
+    });
+  </script>
+</body>
+</html>
