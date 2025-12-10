@@ -393,6 +393,19 @@
       animation: pulse 0.5s infinite;
     }
 
+    .timer-notification {
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      background: rgba(245, 158, 11, 0.1);
+      border-radius: 10px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      font-size: 0.85rem;
+      color: #fbbf24;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
     @media (max-width: 700px) {
       .quiz-container {
         margin: 10px;
@@ -556,6 +569,7 @@
     let timeRemaining = 0; // Remaining time in milliseconds
     let timerInterval = null;
     let timeLimitSet = false; // Flag to check if time limit is set for this topic
+    let timerNotification = null; // Reference to timer notification element
 
     const questionTextEl    = document.getElementById("question-text");
     const optionsListEl     = document.getElementById("options-list");
@@ -655,6 +669,42 @@
       timerContainerEl.style.display = "none";
     }
 
+    // Function to show timer notification
+    function showTimerNotification() {
+      // Remove any existing timer notification first
+      removeTimerNotification();
+      
+      if (timeLimitSet && topicTimeLimit > 0) {
+        // Create new timer notification
+        timerNotification = document.createElement("div");
+        timerNotification.className = "timer-notification";
+        timerNotification.innerHTML = `
+          <span>⏰</span>
+          <span>Timer set: <strong>${topicTimeLimit} minutes</strong> for this quiz</span>
+        `;
+        
+        // Insert it before the question box
+        const questionBox = document.querySelector(".question-box");
+        questionBox.parentNode.insertBefore(timerNotification, questionBox);
+      }
+    }
+
+    // Function to remove timer notification
+    function removeTimerNotification() {
+      if (timerNotification && timerNotification.parentNode) {
+        timerNotification.parentNode.removeChild(timerNotification);
+        timerNotification = null;
+      }
+      
+      // Also remove any timer notifications that might have been added directly to question box
+      const existingNotifications = document.querySelectorAll(".timer-notification");
+      existingNotifications.forEach(notification => {
+        if (notification.parentNode) {
+          notification.parentNode.removeChild(notification);
+        }
+      });
+    }
+
     function autoFinishQuiz() {
       if (!timeLimitSet) return;
       
@@ -676,6 +726,7 @@
       
       // Stop the timer
       stopTimer();
+      removeTimerNotification();
     }
 
     // ---------- Helpers: shuffle + randomize bank ----------
@@ -913,6 +964,7 @@
     function showFinalResults() {
       // Stop timer if it's running
       stopTimer();
+      removeTimerNotification();
       
       // Calculate final score based on user answers
       let finalScore = 0;
@@ -948,21 +1000,9 @@
       };
       
       document.getElementById("new-topic-btn").onclick = () => {
-        restartQuiz();
-        topicSelectEl.value = "";
-        topicBadgeEl.textContent = "No topic selected";
-        questionTextEl.textContent = "No topic selected. Please choose a topic and press 'Start Quiz'.";
-        optionsListEl.innerHTML = "";
-        feedbackEl.textContent = "";
-        submitBtn.style.display = "inline-block";
-        nextBtn.style.display = "inline-block";
-        previousBtn.style.display = "inline-block";
-        finishBtn.style.display = "inline-block";
-        finalScoreEl.style.display = "none";
-        progressBarFillEl.style.width = "0%";
-        questionCounterEl.textContent = "Select a topic and click Start Quiz";
-        scoreMiniEl.textContent = "Score: 0";
+        resetQuizUI();
         stopTimer();
+        removeTimerNotification();
       };
     }
 
@@ -983,6 +1023,34 @@
       }
     }
 
+    function resetQuizUI() {
+      topicSelectEl.value = "";
+      topicBadgeEl.textContent = "No topic selected";
+      questionTextEl.textContent = "No topic selected. Please choose a topic and press 'Start Quiz'.";
+      optionsListEl.innerHTML = "";
+      feedbackEl.textContent = "";
+      submitBtn.style.display = "inline-block";
+      nextBtn.style.display = "inline-block";
+      previousBtn.style.display = "inline-block";
+      finishBtn.style.display = "inline-block";
+      finalScoreEl.style.display = "none";
+      progressBarFillEl.style.width = "0%";
+      questionCounterEl.textContent = "Select a topic and click Start Quiz";
+      scoreMiniEl.textContent = "Score: 0";
+      
+      // Reset all variables
+      questions = [];
+      currentIndex = 0;
+      score = 0;
+      hasAnswered = false;
+      questionsLoaded = false;
+      currentTopicKey = null;
+      userAnswers = [];
+      topicTimeLimit = 0;
+      timeRemaining = 0;
+      timeLimitSet = false;
+    }
+
     function restartQuiz() {
       score = 0;
       currentIndex = 0;
@@ -997,6 +1065,7 @@
       // Restart timer if time limit is set for this topic
       if (timeLimitSet && topicTimeLimit > 0) {
         startTopicTimer();
+        showTimerNotification();
       }
       
       loadQuestionsForTopic(currentTopicKey);
@@ -1060,6 +1129,9 @@
       if (!topic) return;
 
       try {
+        // Clean up any existing timer notifications first
+        removeTimerNotification();
+        
         questionTextEl.textContent = "Loading questions from Google Sheet…";
         optionsListEl.innerHTML = "";
         feedbackEl.textContent = "";
@@ -1097,13 +1169,9 @@
         previousBtn.style.display = "inline-block";
         finishBtn.style.display = "inline-block";
         
-        // Show notification if time limit is set
+        // Show timer notification if time limit is set
         if (timeLimitSet && topicTimeLimit > 0) {
-          const timeInfo = document.createElement("div");
-          timeInfo.className = "feedback";
-          timeInfo.style.color = "#fbbf24";
-          timeInfo.textContent = `⏰ Timer set: ${topicTimeLimit} minutes for this quiz`;
-          document.querySelector(".question-box").appendChild(timeInfo);
+          showTimerNotification();
           
           // Start timer
           startTopicTimer();
@@ -1127,11 +1195,9 @@
         return;
       }
       
-      // Stop any existing timer
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
+      // Stop any existing timer and clean up notifications
+      stopTimer();
+      removeTimerNotification();
       
       currentTopicKey = key;
       const topic = TOPICS[key];
