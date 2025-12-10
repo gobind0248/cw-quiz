@@ -213,8 +213,40 @@
       gap: 10px;
     }
 
+    .left-controls {
+      display: flex;
+      gap: 10px;
+    }
+
+    .right-controls {
+      display: flex;
+      gap: 10px;
+    }
+
     button {
       transition: background 0.15s ease, transform 0.05s ease, box-shadow 0.1s ease;
+    }
+
+    #previous-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      background: #1f2937;
+      color: #e5e7eb;
+      border: 1px solid rgba(75, 85, 99, 0.8);
+      min-width: 120px;
+    }
+
+    #previous-btn:hover:enabled {
+      background: #111827;
+    }
+
+    #previous-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
     }
 
     #submit-btn {
@@ -227,6 +259,7 @@
       background: linear-gradient(to right, #22c55e, #16a34a);
       color: white;
       box-shadow: 0 8px 18px rgba(34, 197, 94, 0.4);
+      min-width: 120px;
     }
 
     #submit-btn:hover:enabled {
@@ -249,7 +282,7 @@
       background: #1f2937;
       color: #e5e7eb;
       border: 1px solid rgba(75, 85, 99, 0.8);
-      display: inline-block;
+      min-width: 120px;
     }
 
     #next-btn:hover:enabled {
@@ -257,6 +290,29 @@
     }
 
     #next-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #finish-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      background: linear-gradient(to right, #f59e0b, #d97706);
+      color: white;
+      box-shadow: 0 8px 18px rgba(245, 158, 11, 0.4);
+      min-width: 120px;
+    }
+
+    #finish-btn:hover:enabled {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(245, 158, 11, 0.5);
+    }
+
+    #finish-btn:disabled {
       opacity: 0.6;
       cursor: not-allowed;
     }
@@ -283,6 +339,21 @@
     @media (max-width: 700px) {
       .quiz-container {
         margin: 10px;
+      }
+      
+      .controls {
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .left-controls, .right-controls {
+        width: 100%;
+        justify-content: center;
+      }
+      
+      button {
+        flex: 1;
+        min-width: 0;
       }
     }
   </style>
@@ -333,8 +404,14 @@
     </div>
 
     <div class="controls">
-      <button id="submit-btn" disabled>Submit</button>
-      <button id="next-btn" disabled>Next Question ➜</button>
+      <div class="left-controls">
+        <button id="previous-btn" disabled>← Previous</button>
+        <button id="submit-btn" disabled>Submit</button>
+      </div>
+      <div class="right-controls">
+        <button id="next-btn" disabled>Next →</button>
+        <button id="finish-btn" disabled>Finish Quiz</button>
+      </div>
     </div>
 
     <div class="score-box">
@@ -399,12 +476,15 @@
     let hasAnswered = false;
     let questionsLoaded = false;
     let currentTopicKey = null;
+    let userAnswers = []; // Track user answers for all questions
 
     const questionTextEl    = document.getElementById("question-text");
     const optionsListEl     = document.getElementById("options-list");
     const feedbackEl        = document.getElementById("feedback");
     const submitBtn         = document.getElementById("submit-btn");
     const nextBtn           = document.getElementById("next-btn");
+    const previousBtn       = document.getElementById("previous-btn");
+    const finishBtn         = document.getElementById("finish-btn");
     const questionCounterEl = document.getElementById("question-counter");
     const progressBarFillEl = document.getElementById("progress-bar-fill");
     const scoreMiniEl       = document.getElementById("score-mini");
@@ -484,6 +564,8 @@
         optionsListEl.innerHTML = "";
         submitBtn.disabled = true;
         nextBtn.disabled = true;
+        previousBtn.disabled = true;
+        finishBtn.disabled = true;
         return;
       }
 
@@ -510,6 +592,11 @@
         input.value = idx;
         input.id = `opt-${idx}`;
 
+        // Restore user's previous selection if exists
+        if (userAnswers[currentIndex] !== undefined) {
+          input.checked = (userAnswers[currentIndex] === idx);
+        }
+
         const label = document.createElement("label");
         label.setAttribute("for", `opt-${idx}`);
         label.textContent = opt;
@@ -520,13 +607,43 @@
 
         li.addEventListener("click", () => {
           const radio = li.querySelector("input");
-          if (radio) radio.checked = true;
+          if (radio) {
+            radio.checked = true;
+            userAnswers[currentIndex] = idx; // Save user's selection
+          }
         });
       });
 
+      // Update button states
       submitBtn.disabled = false;
       submitBtn.textContent = "Submit";
+      previousBtn.disabled = (currentIndex === 0);
       nextBtn.disabled = false;
+      finishBtn.disabled = false;
+      
+      // If user has already answered this question, show the answer
+      if (userAnswers[currentIndex] !== undefined) {
+        const selectedIndex = userAnswers[currentIndex];
+        const isCorrect = (selectedIndex === q.correctIndex);
+        
+        // Show correctness
+        showCorrectness(selectedIndex);
+        lockOptions();
+        submitBtn.disabled = true;
+        hasAnswered = true;
+        
+        // Update feedback
+        if (isCorrect) {
+          feedbackEl.textContent = "✅ Correct!";
+          feedbackEl.className = "feedback correct";
+        } else {
+          feedbackEl.textContent = `❌ Wrong. Correct answer: ${q.options[q.correctIndex]}`;
+          feedbackEl.className = "feedback incorrect";
+        }
+      } else {
+        // Clear feedback for unanswered questions
+        feedbackEl.textContent = "";
+      }
     }
 
     function getSelectedOptionIndex() {
@@ -559,31 +676,79 @@
     }
 
     function goToNextQuestion() {
-      currentIndex++;
-      if (currentIndex < questions.length) {
+      if (currentIndex < questions.length - 1) {
+        currentIndex++;
         renderQuestion();
       } else {
-        progressBarFillEl.style.width = "100%";
-        questionTextEl.textContent = "Quiz Completed!";
+        showFinalResults();
+      }
+    }
+
+    function goToPreviousQuestion() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderQuestion();
+      }
+    }
+
+    function showFinalResults() {
+      // Calculate final score based on user answers
+      let finalScore = 0;
+      for (let i = 0; i < questions.length; i++) {
+        if (userAnswers[i] !== undefined && userAnswers[i] === questions[i].correctIndex) {
+          finalScore++;
+        }
+      }
+      
+      progressBarFillEl.style.width = "100%";
+      questionTextEl.textContent = "Quiz Completed!";
+      optionsListEl.innerHTML = "";
+      feedbackEl.textContent = "";
+      submitBtn.style.display = "none";
+      nextBtn.style.display = "none";
+      previousBtn.style.display = "none";
+      finishBtn.style.display = "none";
+      finalScoreEl.style.display = "block";
+      finalScoreEl.innerHTML = `
+        <strong>Result:</strong> You scored <strong>${finalScore}</strong> out of <strong>${questions.length}</strong>.<br/>
+        Each question = 1 mark.<br/><br/>
+        <button id="restart-btn" style="margin-right: 10px; background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 999px; cursor: pointer;">Restart Same Topic</button>
+        <button id="new-topic-btn" style="background: #6b7280; color: white; border: none; padding: 8px 16px; border-radius: 999px; cursor: pointer;">Choose New Topic</button>
+      `;
+      
+      document.getElementById("restart-btn").onclick = () => {
+        restartQuiz();
+      };
+      
+      document.getElementById("new-topic-btn").onclick = () => {
+        restartQuiz();
+        topicSelectEl.value = "";
+        topicBadgeEl.textContent = "No topic selected";
+        questionTextEl.textContent = "No topic selected. Please choose a topic and press 'Start Quiz'.";
         optionsListEl.innerHTML = "";
         feedbackEl.textContent = "";
-        submitBtn.style.display = "none";
-        nextBtn.style.display = "none";
-        finalScoreEl.style.display = "block";
-        finalScoreEl.innerHTML = `
-          <strong>Result:</strong> You scored <strong>${score}</strong> out of <strong>${questions.length}</strong>.<br/>
-          Each question = 1 mark.<br/><br/>
-          <button id="restart-btn">Restart Same Topic</button>
-        `;
-        document.getElementById("restart-btn").onclick = () => {
-          score = 0;
-          currentIndex = 0;
-          scoreMiniEl.textContent = "Score: 0";
-          submitBtn.style.display = "inline-block";
-          nextBtn.style.display = "inline-block";
-          renderQuestion();
-        };
-      }
+        submitBtn.style.display = "inline-block";
+        nextBtn.style.display = "inline-block";
+        previousBtn.style.display = "inline-block";
+        finishBtn.style.display = "inline-block";
+        finalScoreEl.style.display = "none";
+        progressBarFillEl.style.width = "0%";
+        questionCounterEl.textContent = "Select a topic and click Start Quiz";
+        scoreMiniEl.textContent = "Score: 0";
+      };
+    }
+
+    function restartQuiz() {
+      score = 0;
+      currentIndex = 0;
+      userAnswers = [];
+      scoreMiniEl.textContent = "Score: 0";
+      submitBtn.style.display = "inline-block";
+      nextBtn.style.display = "inline-block";
+      previousBtn.style.display = "inline-block";
+      finishBtn.style.display = "inline-block";
+      finalScoreEl.style.display = "none";
+      loadQuestionsForTopic(currentTopicKey);
     }
 
     // ---------- Events ----------
@@ -599,6 +764,7 @@
 
       const q = questions[currentIndex];
       hasAnswered = true;
+      userAnswers[currentIndex] = selectedIndex; // Save answer
 
       if (selectedIndex === q.correctIndex) {
         score++;
@@ -628,6 +794,16 @@
       goToNextQuestion(); // works as skip or after wrong
     });
 
+    previousBtn.addEventListener("click", () => {
+      goToPreviousQuestion();
+    });
+
+    finishBtn.addEventListener("click", () => {
+      if (confirm("Are you sure you want to finish the quiz? Your current score will be calculated.")) {
+        showFinalResults();
+      }
+    });
+
     async function loadQuestionsForTopic(topicKey) {
       const topic = TOPICS[topicKey];
       if (!topic) return;
@@ -638,6 +814,8 @@
         feedbackEl.textContent = "";
         submitBtn.disabled = true;
         nextBtn.disabled = true;
+        previousBtn.disabled = true;
+        finishBtn.disabled = true;
         finalScoreEl.style.display = "none";
         progressBarFillEl.style.width = "0%";
         questionCounterEl.textContent = "Loading…";
@@ -654,6 +832,7 @@
         }
 
         questions = prepareQuestionBank(parsed); // random order + random options
+        userAnswers = new Array(questions.length); // Initialize empty answers array
 
         questionsLoaded = true;
         currentIndex = 0;
@@ -661,12 +840,16 @@
         scoreMiniEl.textContent = "Score: 0";
         submitBtn.style.display = "inline-block";
         nextBtn.style.display = "inline-block";
+        previousBtn.style.display = "inline-block";
+        finishBtn.style.display = "inline-block";
         renderQuestion();
       } catch (err) {
         console.error(err);
         questionTextEl.textContent = "Error loading questions. Check CSV link, sharing & internet.";
         submitBtn.disabled = true;
         nextBtn.disabled = true;
+        previousBtn.disabled = true;
+        finishBtn.disabled = true;
       }
     }
 
