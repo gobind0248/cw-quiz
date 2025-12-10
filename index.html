@@ -456,9 +456,10 @@
       <button class="start-btn" id="start-btn">Start Quiz</button>
     </div>
 
+    <!-- Timer Container - Will appear when any topic has time limit -->
     <div id="timer-container" class="timer-container" style="display: none;">
-      <div class="timer-label">⏰ Quiz Timer:</div>
-      <div id="timer-display" class="timer-display">--:--:--</div>
+      <div class="timer-label">⏰ Time Remaining:</div>
+      <div id="timer-display" class="timer-display">00:00:00</div>
     </div>
 
     <div class="progress">
@@ -551,9 +552,10 @@
     let questionsLoaded = false;
     let currentTopicKey = null;
     let userAnswers = [];
-    let timeRemaining = 0;
+    let topicTimeLimit = 0; // Time limit in minutes (from Time column)
+    let timeRemaining = 0; // Remaining time in milliseconds
     let timerInterval = null;
-    let timerDuration = 0; // Will be set from Google Sheets
+    let timeLimitSet = false; // Flag to check if time limit is set for this topic
 
     const questionTextEl    = document.getElementById("question-text");
     const optionsListEl     = document.getElementById("options-list");
@@ -574,14 +576,16 @@
 
     // ---------- Timer Functions ----------
 
-    function startTimer() {
-      if (timerDuration <= 0) return;
+    function startTopicTimer() {
+      if (!timeLimitSet || topicTimeLimit <= 0) return;
       
-      timeRemaining = timerDuration;
+      timeRemaining = topicTimeLimit * 60 * 1000; // Convert minutes to milliseconds
       timerContainerEl.style.display = "flex";
       
+      // Update timer immediately
       updateTimerDisplay();
       
+      // Start interval to update timer every second
       timerInterval = setInterval(() => {
         timeRemaining -= 1000;
         
@@ -600,19 +604,46 @@
       const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
       
+      // Format as HH:MM:SS
       const formattedTime = 
         `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
       
       timerDisplayEl.textContent = formattedTime;
       
+      // Update timer label based on time remaining
+      updateTimerLabel(hours, minutes);
+      
+      // Add warning styles based on time remaining
       timerDisplayEl.classList.remove("timer-warning", "timer-critical");
       
-      if (timeRemaining <= 30 * 60 * 1000) {
+      // Warning at 25% of time remaining
+      const warningThreshold = topicTimeLimit * 60 * 1000 * 0.25;
+      
+      if (timeRemaining <= warningThreshold && timeRemaining > 0) {
         timerDisplayEl.classList.add("timer-warning");
       }
       
-      if (timeRemaining <= 10 * 60 * 1000) {
+      // Critical at 10% of time remaining or less than 5 minutes
+      const criticalThreshold = Math.min(topicTimeLimit * 60 * 1000 * 0.10, 5 * 60 * 1000);
+      
+      if (timeRemaining <= criticalThreshold && timeRemaining > 0) {
         timerDisplayEl.classList.add("timer-critical");
+      }
+    }
+
+    function updateTimerLabel(hours, minutes) {
+      const timerLabel = timerContainerEl.querySelector('.timer-label');
+      const totalMinutes = hours * 60 + minutes;
+      
+      if (totalMinutes <= 5) {
+        timerLabel.textContent = "⏰ Hurry! Time almost up:";
+        timerLabel.style.color = "#f87171";
+      } else if (totalMinutes <= 15) {
+        timerLabel.textContent = "⏰ Time running out:";
+        timerLabel.style.color = "#fbbf24";
+      } else {
+        timerLabel.textContent = "⏰ Time Remaining:";
+        timerLabel.style.color = "#93c5fd";
       }
     }
 
@@ -625,100 +656,85 @@
     }
 
     function autoFinishQuiz() {
+      if (!timeLimitSet) return;
+      
+      // Show time's up message
       const timeUpMessage = document.createElement("div");
       timeUpMessage.className = "final-score";
       timeUpMessage.style.backgroundColor = "rgba(239, 68, 68, 0.1)";
       timeUpMessage.style.borderColor = "rgba(239, 68, 68, 0.5)";
       timeUpMessage.innerHTML = `
         <strong style="color: #ef4444;">⏰ Time's Up!</strong><br/>
-        Quiz time has expired.<br/><br/>
+        Your ${topicTimeLimit}-minute time limit has expired.<br/><br/>
       `;
       
+      // Insert before final score
       finalScoreEl.parentNode.insertBefore(timeUpMessage, finalScoreEl);
       
+      // Show final results
       showFinalResults();
+      
+      // Stop the timer
       stopTimer();
     }
 
-    function formatTimeTaken() {
-      if (timerDuration <= 0) return "";
-      
-      const timeTaken = timerDuration - timeRemaining;
-      const hours = Math.floor(timeTaken / (1000 * 60 * 60));
-      const minutes = Math.floor((timeTaken % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((timeTaken % (1000 * 60)) / 1000);
-      
-      return `${hours}h ${minutes}m ${seconds}s`;
-    }
+    // ---------- Helpers: shuffle + randomize bank ----------
 
-    // ---------- CSV Parser with Time Column Support ----------
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
 
     function parseCSV(text) {
       const lines = text.trim().split("\n");
       const result = [];
-      
       if (lines.length <= 1) return result;
 
-      // Get headers
-      const headers = lines[0].split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/).map(h => h.replace(/^"|"$/g, "").trim());
+      // Check if the CSV has headers
+      const headers = lines[0].toLowerCase().split(',');
       
       // Find column indices
-      const questionIndex = headers.findIndex(h => h.toLowerCase().includes("question"));
-      const option1Index = headers.findIndex(h => h.toLowerCase().includes("option1"));
-      const option2Index = headers.findIndex(h => h.toLowerCase().includes("option2"));
-      const option3Index = headers.findIndex(h => h.toLowerCase().includes("option3"));
-      const option4Index = headers.findIndex(h => h.toLowerCase().includes("option4"));
-      const correctIndex = headers.findIndex(h => h.toLowerCase().includes("correct"));
-      const timeIndex = headers.findIndex(h => h.toLowerCase().includes("time"));
+      const questionIndex = headers.findIndex(h => h.includes('question'));
+      const option1Index = headers.findIndex(h => h.includes('option1') || h.includes('option 1'));
+      const option2Index = headers.findIndex(h => h.includes('option2') || h.includes('option 2'));
+      const option3Index = headers.findIndex(h => h.includes('option3') || h.includes('option 3'));
+      const option4Index = headers.findIndex(h => h.includes('option4') || h.includes('option 4'));
+      const correctIndex = headers.findIndex(h => h.includes('correct'));
+      const timeIndex = headers.findIndex(h => h.includes('time'));
       
-      // Reset timer duration
-      timerDuration = 0;
-      
-      // First, check if there's a time value in any row
-      let sheetHasTime = false;
-      let sheetTimeValue = 0;
-      
+      // Reset time limit for this topic
+      topicTimeLimit = 0;
+      timeLimitSet = false;
+
       for (let i = 1; i < lines.length; i++) {
         const row = lines[i].split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
         
-        if (timeIndex >= 0 && timeIndex < row.length) {
+        // Check if we have a time value in the first row (could be for the whole topic)
+        if (i === 1 && timeIndex >= 0 && timeIndex < row.length) {
           const timeValue = row[timeIndex].replace(/^"|"$/g, "").trim();
-          if (timeValue && !isNaN(parseInt(timeValue)) && parseInt(timeValue) > 0) {
-            sheetHasTime = true;
-            sheetTimeValue = parseInt(timeValue);
-            break; // Use first non-zero time value found
+          if (timeValue && !isNaN(parseFloat(timeValue))) {
+            topicTimeLimit = parseFloat(timeValue);
+            timeLimitSet = true;
+            console.log(`Time limit set to ${topicTimeLimit} minutes for this topic`);
           }
         }
-      }
-      
-      // If sheet has time, set timer duration
-      if (sheetHasTime && sheetTimeValue > 0) {
-        timerDuration = sheetTimeValue * 60 * 1000; // Convert minutes to milliseconds
         
-        // Update initial display
-        const initialHours = Math.floor(timerDuration / (1000 * 60 * 60));
-        const initialMinutes = Math.floor((timerDuration % (1000 * 60 * 60)) / (1000 * 60));
-        const initialSeconds = Math.floor((timerDuration % (1000 * 60)) / 1000);
-        
-        timerDisplayEl.textContent = 
-          `${initialHours.toString().padStart(2, '0')}:${initialMinutes.toString().padStart(2, '0')}:${initialSeconds.toString().padStart(2, '0')}`;
-          
-        console.log(`Timer set from Google Sheet: ${sheetTimeValue} minutes = ${timerDisplayEl.textContent}`);
-      } else {
-        console.log("No timer value found in Google Sheet");
-      }
+        // Skip if we don't have enough columns for a question
+        if (row.length < Math.max(questionIndex, option1Index, option2Index, option3Index, option4Index, correctIndex) + 1) {
+          continue;
+        }
 
-      // Parse questions
-      for (let i = 1; i < lines.length; i++) {
-        const row = lines[i].split(/,(?=(?:[^"]*"[^"]*")*[^"]*$/);
-        if (row.length < 6) continue;
+        const q   = row[questionIndex] ? row[questionIndex].replace(/^"|"$/g, "").trim() : "";
+        const o1  = row[option1Index] ? row[option1Index].replace(/^"|"$/g, "").trim() : "";
+        const o2  = row[option2Index] ? row[option2Index].replace(/^"|"$/g, "").trim() : "";
+        const o3  = row[option3Index] ? row[option3Index].replace(/^"|"$/g, "").trim() : "";
+        const o4  = row[option4Index] ? row[option4Index].replace(/^"|"$/g, "").trim() : "";
+        const raw = row[correctIndex] ? row[correctIndex].replace(/^"|"$/g, "").trim() : "";
 
-        const q   = questionIndex >= 0 ? row[questionIndex].replace(/^"|"$/g, "").trim() : row[0].replace(/^"|"$/g, "").trim();
-        const o1  = option1Index >= 0 ? row[option1Index].replace(/^"|"$/g, "").trim() : row[1].replace(/^"|"$/g, "").trim();
-        const o2  = option2Index >= 0 ? row[option2Index].replace(/^"|"$/g, "").trim() : row[2].replace(/^"|"$/g, "").trim();
-        const o3  = option3Index >= 0 ? row[option3Index].replace(/^"|"$/g, "").trim() : row[3].replace(/^"|"$/g, "").trim();
-        const o4  = option4Index >= 0 ? row[option4Index].replace(/^"|"$/g, "").trim() : row[4].replace(/^"|"$/g, "").trim();
-        const raw = correctIndex >= 0 ? row[correctIndex].replace(/^"|"$/g, "").trim() : row[5].replace(/^"|"$/g, "").trim();
+        // Skip empty questions
+        if (!q) continue;
 
         let correctIdx = 0;
         if (/^[1-4]$/.test(raw)) {
@@ -734,16 +750,8 @@
           correctIndex: correctIdx
         });
       }
+      
       return result;
-    }
-
-    // ---------- Helpers: shuffle + randomize bank ----------
-
-    function shuffleArray(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
     }
 
     function prepareQuestionBank(rawQuestions) {
@@ -886,11 +894,25 @@
       });
     }
 
+    function goToNextQuestion() {
+      if (currentIndex < questions.length - 1) {
+        currentIndex++;
+        renderQuestion();
+      } else {
+        showFinalResults();
+      }
+    }
+
+    function goToPreviousQuestion() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderQuestion();
+      }
+    }
+
     function showFinalResults() {
       // Stop timer if it's running
-      if (timerInterval) {
-        stopTimer();
-      }
+      stopTimer();
       
       // Calculate final score based on user answers
       let finalScore = 0;
@@ -910,9 +932,9 @@
       finishBtn.style.display = "none";
       finalScoreEl.style.display = "block";
       
-      // Add timer info
-      const timerInfo = timerDuration > 0 ? 
-        `<br/><small style="color: #9ca3af;">Time taken: ${formatTimeTaken()}</small>` : '';
+      // Add timer info if time limit was set
+      const timerInfo = timeLimitSet ? 
+        `<br/><small style="color: #9ca3af;">Time limit: ${topicTimeLimit} minutes | ${formatTimeTaken()}</small>` : '';
       
       finalScoreEl.innerHTML = `
         <strong>Result:</strong> You scored <strong>${finalScore}</strong> out of <strong>${questions.length}</strong>.${timerInfo}<br/>
@@ -944,19 +966,20 @@
       };
     }
 
-    function goToNextQuestion() {
-      if (currentIndex < questions.length - 1) {
-        currentIndex++;
-        renderQuestion();
+    function formatTimeTaken() {
+      if (!timeLimitSet) return "";
+      
+      const timeTaken = topicTimeLimit * 60 * 1000 - timeRemaining;
+      const hours = Math.floor(timeTaken / (1000 * 60 * 60));
+      const minutes = Math.floor((timeTaken % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeTaken % (1000 * 60)) / 1000);
+      
+      if (hours > 0) {
+        return `Time taken: ${hours}h ${minutes}m ${seconds}s`;
+      } else if (minutes > 0) {
+        return `Time taken: ${minutes}m ${seconds}s`;
       } else {
-        showFinalResults();
-      }
-    }
-
-    function goToPreviousQuestion() {
-      if (currentIndex > 0) {
-        currentIndex--;
-        renderQuestion();
+        return `Time taken: ${seconds}s`;
       }
     }
 
@@ -971,9 +994,9 @@
       finishBtn.style.display = "inline-block";
       finalScoreEl.style.display = "none";
       
-      // Restart timer if duration is set
-      if (timerDuration > 0) {
-        startTimer();
+      // Restart timer if time limit is set for this topic
+      if (timeLimitSet && topicTimeLimit > 0) {
+        startTopicTimer();
       }
       
       loadQuestionsForTopic(currentTopicKey);
@@ -1050,7 +1073,6 @@
 
         // Hide timer initially
         timerContainerEl.style.display = "none";
-        timerDuration = 0;
 
         const res = await fetch(topic.url);
         if (!res.ok) throw new Error("Network error");
@@ -1063,8 +1085,8 @@
           return;
         }
 
-        questions = prepareQuestionBank(parsed); // random order + random options
-        userAnswers = new Array(questions.length); // Initialize empty answers array
+        questions = prepareQuestionBank(parsed);
+        userAnswers = new Array(questions.length);
 
         questionsLoaded = true;
         currentIndex = 0;
@@ -1074,12 +1096,17 @@
         nextBtn.style.display = "inline-block";
         previousBtn.style.display = "inline-block";
         finishBtn.style.display = "inline-block";
-
-        topicBadgeEl.textContent = topic.name;
         
-        // Start timer if duration was found in sheet
-        if (timerDuration > 0) {
-          startTimer();
+        // Show notification if time limit is set
+        if (timeLimitSet && topicTimeLimit > 0) {
+          const timeInfo = document.createElement("div");
+          timeInfo.className = "feedback";
+          timeInfo.style.color = "#fbbf24";
+          timeInfo.textContent = `⏰ Timer set: ${topicTimeLimit} minutes for this quiz`;
+          document.querySelector(".question-box").appendChild(timeInfo);
+          
+          // Start timer
+          startTopicTimer();
         }
         
         renderQuestion();
