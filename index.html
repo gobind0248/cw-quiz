@@ -63,6 +63,24 @@
       text-align: center;
     }
 
+    .timer-badge {
+      font-size: 0.78rem;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(239, 68, 68, 0.1);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      white-space: nowrap;
+      text-align: center;
+      font-weight: 600;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
     .topic-select-row {
       margin-bottom: 14px;
       display: flex;
@@ -336,6 +354,45 @@
       color: #22c55e;
     }
 
+    .timer-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      background: rgba(239, 68, 68, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .timer-label {
+      font-size: 0.85rem;
+      color: #fca5a5;
+    }
+
+    .timer-display {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #f87171;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 1px;
+    }
+
+    .timer-warning {
+      color: #fbbf24;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .timer-critical {
+      color: #ef4444;
+      animation: pulse 0.5s infinite;
+    }
+
     @media (max-width: 700px) {
       .quiz-container {
         margin: 10px;
@@ -354,6 +411,18 @@
       button {
         flex: 1;
         min-width: 0;
+      }
+      
+      .quiz-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      
+      .timer-container {
+        flex-direction: column;
+        gap: 5px;
+        align-items: flex-start;
       }
     }
   </style>
@@ -385,6 +454,11 @@
         <option value="mock">11. Mock Test</option>
       </select>
       <button class="start-btn" id="start-btn">Start Quiz</button>
+    </div>
+
+    <div id="timer-container" class="timer-container" style="display: none;">
+      <div class="timer-label">⏰ Mock Test Timer:</div>
+      <div id="timer-display" class="timer-display">03:00:00</div>
     </div>
 
     <div class="progress">
@@ -466,7 +540,9 @@
       },
       mock: {
         name: "Mock Test",
-        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=770400940`
+        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=770400940`,
+        hasTimer: true,
+        duration: 3 * 60 * 60 * 1000 // 3 hours in milliseconds
       }
     };
 
@@ -477,6 +553,9 @@
     let questionsLoaded = false;
     let currentTopicKey = null;
     let userAnswers = []; // Track user answers for all questions
+    let mockTestTimer = null;
+    let timeRemaining = 0;
+    let timerInterval = null;
 
     const questionTextEl    = document.getElementById("question-text");
     const optionsListEl     = document.getElementById("options-list");
@@ -492,6 +571,88 @@
     const topicSelectEl     = document.getElementById("topic-select");
     const startBtnEl        = document.getElementById("start-btn");
     const topicBadgeEl      = document.getElementById("current-topic-badge");
+    const timerContainerEl  = document.getElementById("timer-container");
+    const timerDisplayEl    = document.getElementById("timer-display");
+
+    // ---------- Timer Functions ----------
+
+    function startMockTestTimer() {
+      const topic = TOPICS.mock;
+      if (!topic.hasTimer) return;
+      
+      timeRemaining = topic.duration; // 3 hours in milliseconds
+      timerContainerEl.style.display = "flex";
+      
+      // Update timer immediately
+      updateTimerDisplay();
+      
+      // Start interval to update timer every second
+      timerInterval = setInterval(() => {
+        timeRemaining -= 1000;
+        
+        if (timeRemaining <= 0) {
+          timeRemaining = 0;
+          clearInterval(timerInterval);
+          autoFinishMockTest();
+        }
+        
+        updateTimerDisplay();
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
+      const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+      
+      // Format as HH:MM:SS
+      const formattedTime = 
+        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+      
+      timerDisplayEl.textContent = formattedTime;
+      
+      // Add warning styles based on time remaining
+      timerDisplayEl.classList.remove("timer-warning", "timer-critical");
+      
+      if (timeRemaining <= 30 * 60 * 1000) { // 30 minutes or less
+        timerDisplayEl.classList.add("timer-warning");
+      }
+      
+      if (timeRemaining <= 10 * 60 * 1000) { // 10 minutes or less
+        timerDisplayEl.classList.add("timer-critical");
+      }
+    }
+
+    function stopTimer() {
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      timerContainerEl.style.display = "none";
+    }
+
+    function autoFinishMockTest() {
+      if (currentTopicKey !== "mock") return;
+      
+      // Show time's up message
+      const timeUpMessage = document.createElement("div");
+      timeUpMessage.className = "final-score";
+      timeUpMessage.style.backgroundColor = "rgba(239, 68, 68, 0.1)";
+      timeUpMessage.style.borderColor = "rgba(239, 68, 68, 0.5)";
+      timeUpMessage.innerHTML = `
+        <strong style="color: #ef4444;">⏰ Time's Up!</strong><br/>
+        Your 3-hour Mock Test time has expired.<br/><br/>
+      `;
+      
+      // Insert before final score
+      finalScoreEl.parentNode.insertBefore(timeUpMessage, finalScoreEl);
+      
+      // Show final results
+      showFinalResults();
+      
+      // Stop the timer
+      stopTimer();
+    }
 
     // ---------- Helpers: shuffle + randomize bank ----------
 
@@ -692,6 +853,11 @@
     }
 
     function showFinalResults() {
+      // Stop timer if it's running
+      if (currentTopicKey === "mock") {
+        stopTimer();
+      }
+      
       // Calculate final score based on user answers
       let finalScore = 0;
       for (let i = 0; i < questions.length; i++) {
@@ -709,8 +875,13 @@
       previousBtn.style.display = "none";
       finishBtn.style.display = "none";
       finalScoreEl.style.display = "block";
+      
+      // Add timer info for mock test
+      const timerInfo = currentTopicKey === "mock" ? 
+        `<br/><small style="color: #9ca3af;">Time taken: ${formatTimeTaken()}</small>` : '';
+      
       finalScoreEl.innerHTML = `
-        <strong>Result:</strong> You scored <strong>${finalScore}</strong> out of <strong>${questions.length}</strong>.<br/>
+        <strong>Result:</strong> You scored <strong>${finalScore}</strong> out of <strong>${questions.length}</strong>.${timerInfo}<br/>
         Each question = 1 mark.<br/><br/>
         <button id="restart-btn" style="margin-right: 10px; background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 999px; cursor: pointer;">Restart Same Topic</button>
         <button id="new-topic-btn" style="background: #6b7280; color: white; border: none; padding: 8px 16px; border-radius: 999px; cursor: pointer;">Choose New Topic</button>
@@ -735,7 +906,19 @@
         progressBarFillEl.style.width = "0%";
         questionCounterEl.textContent = "Select a topic and click Start Quiz";
         scoreMiniEl.textContent = "Score: 0";
+        stopTimer();
       };
+    }
+
+    function formatTimeTaken() {
+      if (currentTopicKey !== "mock" || !TOPICS.mock.hasTimer) return "";
+      
+      const timeTaken = TOPICS.mock.duration - timeRemaining;
+      const hours = Math.floor(timeTaken / (1000 * 60 * 60));
+      const minutes = Math.floor((timeTaken % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeTaken % (1000 * 60)) / 1000);
+      
+      return `${hours}h ${minutes}m ${seconds}s`;
     }
 
     function restartQuiz() {
@@ -748,6 +931,12 @@
       previousBtn.style.display = "inline-block";
       finishBtn.style.display = "inline-block";
       finalScoreEl.style.display = "none";
+      
+      // Restart timer for mock test
+      if (currentTopicKey === "mock") {
+        startMockTestTimer();
+      }
+      
       loadQuestionsForTopic(currentTopicKey);
     }
 
@@ -820,6 +1009,9 @@
         progressBarFillEl.style.width = "0%";
         questionCounterEl.textContent = "Loading…";
 
+        // Hide timer initially
+        timerContainerEl.style.display = "none";
+
         const res = await fetch(topic.url);
         if (!res.ok) throw new Error("Network error");
         const text = await res.text();
@@ -842,6 +1034,12 @@
         nextBtn.style.display = "inline-block";
         previousBtn.style.display = "inline-block";
         finishBtn.style.display = "inline-block";
+        
+        // Start timer for mock test
+        if (topicKey === "mock" && topic.hasTimer) {
+          startMockTestTimer();
+        }
+        
         renderQuestion();
       } catch (err) {
         console.error(err);
@@ -859,6 +1057,13 @@
         alert("Please select a topic first.");
         return;
       }
+      
+      // Stop any existing timer
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      
       currentTopicKey = key;
       const topic = TOPICS[key];
       topicBadgeEl.textContent = topic ? topic.name : "Topic";
