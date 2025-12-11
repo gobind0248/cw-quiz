@@ -406,6 +406,21 @@
       gap: 8px;
     }
 
+    .loading-spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(59, 130, 246, 0.3);
+      border-radius: 50%;
+      border-top-color: #3b82f6;
+      animation: spin 1s ease-in-out infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     @media (max-width: 700px) {
       .quiz-container {
         margin: 10px;
@@ -444,7 +459,7 @@
   <div class="quiz-container">
     <div class="quiz-header">
       <div>
-        <div class="title">C&W JE DPQ/LDCE MCQ Practice</div>
+        <div class="title">C&W JE / LDCE Multi-Topic MCQ Practice</div>
         <div class="subtitle">Created By Gobind Sharma</div>
       </div>
       <div class="badge" id="current-topic-badge">No topic selected</div>
@@ -453,20 +468,9 @@
     <div class="topic-select-row">
       <label for="topic-select">Select Topic / Chapter:</label>
       <select id="topic-select">
-        <option value="">-- Choose Topic --</option>
-        <option value="icf">1. ICF Coach</option>
-        <option value="icfbr">2. ICF Brake & Schedules</option>
-        <option value="brake">3. Brake System (General)</option>
-        <option value="lhb">4. LHB / FIAT / Hybrid</option>
-        <option value="wagon">5. Wagon & Bogies</option>
-        <option value="wheel">6. Wheel / Axle / Limits</option>
-        <option value="cbc">7. Coupler & Draft Gear</option>
-        <option value="track">8. Track & Accident Rules</option>
-        <option value="wrk">9. Workshop / Schedule / Safety</option>
-        <option value="nt">10. Non-Technical (Math / Reasoning / GA)</option>
-        <option value="mock">11. Mock Test</option>
+        <option value="">Loading topics...</option>
       </select>
-      <button class="start-btn" id="start-btn">Start Quiz</button>
+      <button class="start-btn" id="start-btn" disabled>Start Quiz</button>
     </div>
 
     <!-- Timer Container - Will appear when any topic has time limit -->
@@ -508,55 +512,10 @@
   </div>
 
   <script>
-    // ========= CONFIG: Your Sheet & Topics =========
-    const BASE_ID = "1hJSzOmZZilf3XR4SxlM-s_xPoq-4KkQKJ9vF8TGxSn4";
-
-    const TOPICS = {
-      icf: {
-        name: "ICF Coach",
-        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=0`
-      },
-      icfbr: {
-        name: "ICF Brake & Schedules",
-        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=264887129`
-      },
-      brake: {
-        name: "Brake System (General)",
-        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=265201723`
-      },
-      lhb: {
-        name: "LHB / FIAT / Hybrid",
-        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=567109127`
-      },
-      wagon: {
-        name: "Wagon & Bogies",
-        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=1900017436`
-      },
-      wheel: {
-        name: "Wheel / Axle / Limits",
-        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=978447235`
-      },
-      cbc: {
-        name: "Coupler & Draft Gear",
-        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=209950154`
-      },
-      track: {
-        name: "Track & Accident Rules",
-        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=871729689`
-      },
-      wrk: {
-        name: "Workshop / Schedule / Safety",
-        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=1894868920`
-      },
-      nt: {
-        name: "Non-Technical (Math / Reasoning / GA)",
-        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=2066648063`
-      },
-      mock: {
-        name: "Mock Test",
-        url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=770400940`
-      }
-    };
+    // ========= GLOBAL VARIABLES =========
+    let topicsData = null;
+    let BASE_ID = "";
+    let TOPICS = {};
 
     let questions = [];
     let currentIndex = 0;
@@ -587,6 +546,53 @@
     const topicBadgeEl      = document.getElementById("current-topic-badge");
     const timerContainerEl  = document.getElementById("timer-container");
     const timerDisplayEl    = document.getElementById("timer-display");
+
+    // ---------- Initialize App ----------
+
+    async function initializeApp() {
+      try {
+        // Show loading state
+        topicSelectEl.innerHTML = '<option value="">Loading topics...</option>';
+        
+        // Load topics from JSON file
+        const response = await fetch('topics.json');
+        if (!response.ok) throw new Error('Failed to load topics.json');
+        
+        topicsData = await response.json();
+        BASE_ID = topicsData.base_sheet_id;
+        
+        // Build TOPICS object from JSON data
+        TOPICS = {};
+        topicsData.topics.forEach(topic => {
+          TOPICS[topic.id] = {
+            name: topic.name,
+            url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=${topic.gid}`
+          };
+        });
+        
+        // Populate topic dropdown
+        populateTopicDropdown();
+        
+        // Enable start button
+        startBtnEl.disabled = false;
+        
+      } catch (error) {
+        console.error('Error loading topics:', error);
+        topicSelectEl.innerHTML = '<option value="">Error loading topics</option>';
+        questionTextEl.textContent = "Error loading topics. Please check if topics.json file exists.";
+      }
+    }
+
+    function populateTopicDropdown() {
+      topicSelectEl.innerHTML = '<option value="">-- Choose Topic --</option>';
+      
+      topicsData.topics.forEach(topic => {
+        const option = document.createElement('option');
+        option.value = topic.id;
+        option.textContent = topic.name;
+        topicSelectEl.appendChild(option);
+      });
+    }
 
     // ---------- Timer Functions ----------
 
@@ -669,7 +675,6 @@
       timerContainerEl.style.display = "none";
     }
 
-    // Function to show timer notification
     function showTimerNotification() {
       // Remove any existing timer notification first
       removeTimerNotification();
@@ -689,7 +694,6 @@
       }
     }
 
-    // Function to remove timer notification
     function removeTimerNotification() {
       if (timerNotification && timerNotification.parentNode) {
         timerNotification.parentNode.removeChild(timerNotification);
@@ -729,7 +733,7 @@
       removeTimerNotification();
     }
 
-    // ---------- Helpers: shuffle + randomize bank ----------
+    // ---------- CSV Parsing & Question Management ----------
 
     function shuffleArray(arr) {
       for (let i = arr.length - 1; i > 0; i--) {
@@ -1071,58 +1075,7 @@
       loadQuestionsForTopic(currentTopicKey);
     }
 
-    // ---------- Events ----------
-
-    submitBtn.addEventListener("click", () => {
-      if (!questionsLoaded || hasAnswered) return;
-
-      const selectedIndex = getSelectedOptionIndex();
-      if (selectedIndex === -1) {
-        alert("Please select an option before submitting.");
-        return;
-      }
-
-      const q = questions[currentIndex];
-      hasAnswered = true;
-      userAnswers[currentIndex] = selectedIndex; // Save answer
-
-      if (selectedIndex === q.correctIndex) {
-        score++;
-        feedbackEl.textContent = "✅ Correct!";
-        feedbackEl.className = "feedback correct";
-      } else {
-        feedbackEl.textContent = `❌ Wrong. Correct answer: ${q.options[q.correctIndex]}`;
-        feedbackEl.className = "feedback incorrect";
-      }
-
-      scoreMiniEl.textContent = `Score: ${score}`;
-      showCorrectness(selectedIndex);
-      lockOptions();
-      submitBtn.disabled = true;
-
-      if (selectedIndex === q.correctIndex) {
-        nextBtn.disabled = true;
-        setTimeout(() => {
-          nextBtn.disabled = false;
-          goToNextQuestion();
-        }, 700);
-      }
-      // wrong → user presses Next to move on
-    });
-
-    nextBtn.addEventListener("click", () => {
-      goToNextQuestion(); // works as skip or after wrong
-    });
-
-    previousBtn.addEventListener("click", () => {
-      goToPreviousQuestion();
-    });
-
-    finishBtn.addEventListener("click", () => {
-      if (confirm("Are you sure you want to finish the quiz? Your current score will be calculated.")) {
-        showFinalResults();
-      }
-    });
+    // ---------- Question Loading ----------
 
     async function loadQuestionsForTopic(topicKey) {
       const topic = TOPICS[topicKey];
@@ -1188,6 +1141,58 @@
       }
     }
 
+    // ---------- Event Listeners ----------
+
+    submitBtn.addEventListener("click", () => {
+      if (!questionsLoaded || hasAnswered) return;
+
+      const selectedIndex = getSelectedOptionIndex();
+      if (selectedIndex === -1) {
+        alert("Please select an option before submitting.");
+        return;
+      }
+
+      const q = questions[currentIndex];
+      hasAnswered = true;
+      userAnswers[currentIndex] = selectedIndex; // Save answer
+
+      if (selectedIndex === q.correctIndex) {
+        score++;
+        feedbackEl.textContent = "✅ Correct!";
+        feedbackEl.className = "feedback correct";
+      } else {
+        feedbackEl.textContent = `❌ Wrong. Correct answer: ${q.options[q.correctIndex]}`;
+        feedbackEl.className = "feedback incorrect";
+      }
+
+      scoreMiniEl.textContent = `Score: ${score}`;
+      showCorrectness(selectedIndex);
+      lockOptions();
+      submitBtn.disabled = true;
+
+      if (selectedIndex === q.correctIndex) {
+        nextBtn.disabled = true;
+        setTimeout(() => {
+          nextBtn.disabled = false;
+          goToNextQuestion();
+        }, 700);
+      }
+    });
+
+    nextBtn.addEventListener("click", () => {
+      goToNextQuestion();
+    });
+
+    previousBtn.addEventListener("click", () => {
+      goToPreviousQuestion();
+    });
+
+    finishBtn.addEventListener("click", () => {
+      if (confirm("Are you sure you want to finish the quiz? Your current score will be calculated.")) {
+        showFinalResults();
+      }
+    });
+
     startBtnEl.addEventListener("click", () => {
       const key = topicSelectEl.value;
       if (!key) {
@@ -1204,6 +1209,9 @@
       topicBadgeEl.textContent = topic ? topic.name : "Topic";
       loadQuestionsForTopic(key);
     });
+
+    // Initialize the app when page loads
+    document.addEventListener('DOMContentLoaded', initializeApp);
   </script>
 </body>
 </html>
