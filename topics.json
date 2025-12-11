@@ -2,57 +2,57 @@
   "topics": [
     {
       "id": "icf",
-      "name": "1. ICF Coach",
+      "name": "ICF Coach",
       "gid": "0"
     },
     {
       "id": "icfbr",
-      "name": "2. ICF Brake & Schedules",
+      "name": "ICF Brake & Schedules",
       "gid": "264887129"
     },
     {
       "id": "brake",
-      "name": "3. Brake System (General)",
+      "name": "Brake System (General)",
       "gid": "265201723"
     },
     {
       "id": "lhb",
-      "name": "4. LHB / FIAT / Hybrid",
+      "name": "LHB / FIAT / Hybrid",
       "gid": "567109127"
     },
     {
       "id": "wagon",
-      "name": "5. Wagon & Bogies",
+      "name": "Wagon & Bogies",
       "gid": "1900017436"
     },
     {
       "id": "wheel",
-      "name": "6. Wheel / Axle / Limits",
+      "name": "Wheel / Axle / Limits",
       "gid": "978447235"
     },
     {
       "id": "cbc",
-      "name": "7. Coupler & Draft Gear",
+      "name": "Coupler & Draft Gear",
       "gid": "209950154"
     },
     {
       "id": "track",
-      "name": "8. Track & Accident Rules",
+      "name": "Track & Accident Rules",
       "gid": "871729689"
     },
     {
       "id": "wrk",
-      "name": "9. Workshop / Schedule / Safety",
+      "name": "Workshop / Schedule / Safety",
       "gid": "1894868920"
     },
     {
       "id": "nt",
-      "name": "10. Non-Technical (Math / Reasoning / GA)",
+      "name": "Non-Technical (Math / Reasoning / GA)",
       "gid": "2066648063"
     },
     {
       "id": "mock",
-      "name": "11. Mock Test",
+      "name": "Mock Test",
       "gid": "770400940"
     }
   ],
