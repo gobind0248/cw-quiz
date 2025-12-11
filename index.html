@@ -236,35 +236,7 @@
       margin: 20px;
     }
 
-    /* Logout button in quiz header */
-    .logout-btn {
-      background: rgba(239, 68, 68, 0.1);
-      color: #fca5a5;
-      border: 1px solid rgba(239, 68, 68, 0.5);
-      border-radius: 999px;
-      padding: 6px 12px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      display: none;
-    }
-
-    .logout-btn:hover {
-      background: rgba(239, 68, 68, 0.2);
-      transform: translateY(-1px);
-    }
-
-    .user-info {
-      font-size: 0.8rem;
-      color: #93c5fd;
-      background: rgba(59, 130, 246, 0.1);
-      padding: 4px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      display: none;
-    }
-
-    /* Update quiz header to accommodate logout button */
+    /* Quiz Header - Updated to match XML version */
     .quiz-header {
       display: flex;
       justify-content: space-between;
@@ -272,10 +244,6 @@
       margin-bottom: 12px;
       gap: 10px;
       flex-wrap: wrap;
-    }
-
-    .quiz-header > div:first-child {
-      flex: 1;
     }
 
     .title {
@@ -290,15 +258,54 @@
       margin-top: 2px;
     }
 
+    /* User info and logout button container */
+    .user-logout-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Badge styling - updated */
     .badge {
       font-size: 0.78rem;
-      padding: 3px 10px;
+      padding: 4px 12px;
       border-radius: 999px;
       background: rgba(59, 130, 246, 0.1);
       color: #93c5fd;
       border: 1px solid rgba(37, 99, 235, 0.5);
       white-space: nowrap;
       text-align: center;
+    }
+
+    /* Logout button styling - updated */
+    #logout-btn {
+      background: rgba(239, 68, 68, 0.1);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: none;
+      white-space: nowrap;
+    }
+
+    #logout-btn:hover {
+      background: rgba(239, 68, 68, 0.2);
+      transform: translateY(-1px);
+    }
+
+    /* User info display */
+    #user-info {
+      font-size: 0.8rem;
+      color: #93c5fd;
+      background: rgba(59, 130, 246, 0.1);
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      display: none;
+      white-space: nowrap;
     }
 
     .timer-badge {
@@ -319,30 +326,31 @@
       50% { opacity: 0.7; }
     }
 
-    /* LEFT-ALIGNED TOPIC SELECTION SECTION */
-    .topic-select-row {
+    /* TOPIC SELECTION SECTION - Updated to match XML version */
+    .topic-row {
       margin-bottom: 14px;
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       align-items: center;
-      justify-content: flex-start; /* Changed from center to flex-start */
     }
 
-    .topic-select-row label {
+    .topic-row label {
       font-size: 0.9rem;
       color: #d1d5db;
       white-space: nowrap;
     }
 
-    select {
+    .topic-select {
       background: #020617;
       color: #e5e7eb;
-      border-radius: 999px;
+      border-radius: 8px;
       border: 1px solid rgba(75, 85, 99, 0.9);
-      padding: 6px 10px;
+      padding: 8px 12px;
       font-size: 0.9rem;
-      min-width: 220px;
+      min-width: 200px;
+      flex: 1;
+      max-width: 300px;
     }
 
     .start-btn {
@@ -355,11 +363,33 @@
       background: linear-gradient(to right, #3b82f6, #2563eb);
       color: white;
       box-shadow: 0 8px 18px rgba(37, 99, 235, 0.4);
+      white-space: nowrap;
     }
 
     .start-btn:hover {
       transform: translateY(-1px);
       box-shadow: 0 10px 22px rgba(37, 99, 235, 0.5);
+    }
+
+    /* RANDOMIZE TOGGLE - Added from XML version */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: #cbd5f5;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+
+    .toggle-row input {
+      transform: scale(1.1);
+      cursor: pointer;
+      accent-color: #3b82f6;
+    }
+
+    .toggle-row label {
+      cursor: pointer;
     }
 
     .progress {
@@ -698,10 +728,30 @@
         min-width: 0;
       }
       
+      /* Mobile adjustments for quiz header */
       .quiz-header {
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
+      }
+      
+      .user-logout-container {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 5px;
+      }
+      
+      .badge, #logout-btn {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+      }
+      
+      .title {
+        font-size: 1.1rem;
+      }
+      
+      .subtitle {
+        font-size: 0.75rem;
       }
       
       .timer-container {
@@ -720,22 +770,23 @@
         text-align: center;
       }
       
-      /* Mobile adjustments for left-aligned topic section */
-      .topic-select-row {
+      /* Mobile adjustments for topic row - matches XML version */
+      .topic-row {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
         gap: 8px;
       }
       
-      .topic-select-row label,
-      .topic-select-row select,
-      .topic-select-row .start-btn {
+      .topic-row label,
+      .topic-row .topic-select,
+      .topic-row .start-btn {
         width: 100%;
       }
       
-      select {
+      .topic-select {
         min-width: 0;
         width: 100%;
+        max-width: 100%;
       }
       
       .start-btn {
@@ -760,19 +811,22 @@
   
   <!-- Quiz Container (hidden by default, shown after login) -->
   <div class="quiz-container">
+    <!-- UPDATED QUIZ HEADER - Matches XML version layout -->
     <div class="quiz-header">
       <div>
         <div class="title">JE DPQ / LDCE MCQ Practice</div>
-        <div class="subtitle">Created By Gobind Sharma</div>
+        <div class="subtitle">Created By Gobind Sharma • Logged in as: <span id="logged-in-user">Guest</span></div>
       </div>
-      <div class="badge" id="current-topic-badge">No topic selected</div>
-      <!-- Logout button will be added here by JavaScript -->
+      <div class="user-logout-container">
+        <div class="badge" id="current-topic-badge">No topic selected</div>
+        <button id="logout-btn">Logout</button>
+      </div>
     </div>
 
-    <!-- LEFT-ALIGNED TOPIC SELECTION SECTION -->
-    <div class="topic-select-row">
+    <!-- UPDATED TOPIC SELECTION SECTION - Matches XML version -->
+    <div class="topic-row">
       <label for="topic-select">Topic:</label>
-      <select id="topic-select">
+      <select id="topic-select" class="topic-select">
         <option value="">Loading topics...</option>
       </select>
       <button class="start-btn" id="start-btn" disabled>Load Topic</button>
@@ -784,8 +838,14 @@
       <div id="timer-display" class="timer-display">00:00:00</div>
     </div>
 
+    <!-- RANDOMIZE TOGGLE - Added from XML version -->
+    <div class="toggle-row">
+      <input type="checkbox" id="random-toggle" checked />
+      <label for="random-toggle">Randomize questions & options</label>
+    </div>
+
     <div class="progress">
-      <div id="question-counter">Select a topic and click Start Quiz</div>
+      <div id="question-counter">Select a topic and click Load Topic</div>
       <div class="progress-bar">
         <div id="progress-bar-fill" class="progress-bar-fill"></div>
       </div>
@@ -794,7 +854,7 @@
 
     <div class="question-box">
       <div id="question-text" class="question-text">
-       Waiting for Topic.
+        Please login to access the quiz.
       </div>
       <ul id="options-list" class="options"></ul>
       <div id="feedback" class="feedback"></div>
@@ -838,7 +898,7 @@
             this.passwordInput = null;
             this.loginBtn = null;
             this.logoutBtn = null;
-            this.userInfo = null;
+            this.loggedInUserEl = null;
             this.errorMsg = null;
             this.lockedUntil = null;
             
@@ -919,6 +979,12 @@
             this.togglePasswordBtn = document.getElementById('toggle-password');
             this.lockedMessage = document.getElementById('locked-message');
             this.lockTimer = document.getElementById('lock-timer');
+            
+            // Get the logged in user element from the quiz container
+            this.loggedInUserEl = document.getElementById('logged-in-user');
+            
+            // Get the logout button from the quiz container
+            this.logoutBtn = document.getElementById('logout-btn');
         }
 
         attachEventListeners() {
@@ -939,31 +1005,10 @@
             this.usernameInput.addEventListener('input', () => this.clearError());
             this.passwordInput.addEventListener('input', () => this.clearError());
 
-            // Add logout button to quiz header
-            this.createLogoutButton();
-        }
-
-        createLogoutButton() {
-            // Create logout button
-            this.logoutBtn = document.createElement('button');
-            this.logoutBtn.id = 'logout-btn';
-            this.logoutBtn.className = 'logout-btn';
-            this.logoutBtn.innerHTML = '👤 Logout';
-            this.logoutBtn.style.display = 'none';
-            this.logoutBtn.addEventListener('click', () => this.handleLogout());
-            
-            // Add logout button to quiz header
-            const quizHeader = document.querySelector('.quiz-header');
-            if (quizHeader) {
-                quizHeader.appendChild(this.logoutBtn);
+            // Add logout button event listener
+            if (this.logoutBtn) {
+                this.logoutBtn.addEventListener('click', () => this.handleLogout());
             }
-
-            // Create user info display
-            this.userInfo = document.createElement('div');
-            this.userInfo.id = 'user-info';
-            this.userInfo.className = 'user-info';
-            this.userInfo.style.display = 'none';
-            quizHeader.appendChild(this.userInfo);
         }
 
         async handleLogin() {
@@ -1088,8 +1133,11 @@
             this.loginContainer.style.display = 'none';
             this.quizContainer.style.display = 'block';
             this.logoutBtn.style.display = 'block';
-            this.userInfo.style.display = 'block';
-            this.userInfo.textContent = `👤 ${this.currentUser}`;
+            
+            // Update the logged in user display
+            if (this.loggedInUserEl) {
+                this.loggedInUserEl.textContent = this.currentUser;
+            }
         }
 
         handleLogout() {
@@ -1111,7 +1159,11 @@
                 this.loginContainer.style.display = 'block';
                 this.quizContainer.style.display = 'none';
                 this.logoutBtn.style.display = 'none';
-                this.userInfo.style.display = 'none';
+                
+                // Reset logged in user display
+                if (this.loggedInUserEl) {
+                    this.loggedInUserEl.textContent = 'Guest';
+                }
                 
                 // Reset any quiz state if needed
                 if (window.resetQuizState) {
@@ -1139,6 +1191,12 @@
                         // Session is valid
                         this.isAuthenticated = true;
                         this.currentUser = session.username;
+                        
+                        // Update logged in user display
+                        if (this.loggedInUserEl) {
+                            this.loggedInUserEl.textContent = this.currentUser;
+                        }
+                        
                         this.showQuiz();
                     } else {
                         // Session expired
@@ -1262,6 +1320,7 @@
     const topicBadgeEl      = document.getElementById("current-topic-badge");
     const timerContainerEl  = document.getElementById("timer-container");
     const timerDisplayEl    = document.getElementById("timer-display");
+    const randomToggleEl    = document.getElementById("random-toggle"); // Added
 
     // Function to reset quiz state (used by logout)
     window.resetQuizState = function() {
@@ -1286,14 +1345,14 @@
       topicSelectEl.innerHTML = '<option value="">-- Choose Topic --</option>';
       topicSelectEl.disabled = false;
       startBtnEl.disabled = false;
-      questionTextEl.textContent = "Waiting for Topic.";
+      questionTextEl.textContent = "Please login to access the quiz.";
       optionsListEl.innerHTML = "";
       feedbackEl.textContent = "";
       submitBtn.disabled = true;
       nextBtn.disabled = true;
       previousBtn.disabled = true;
       finishBtn.disabled = true;
-      questionCounterEl.textContent = "Select a topic and click Start Quiz";
+      questionCounterEl.textContent = "Select a topic and click Load Topic";
       progressBarFillEl.style.width = "0%";
       scoreMiniEl.textContent = "Score: 0";
       finalScoreEl.style.display = "none";
@@ -1544,6 +1603,7 @@
       return result;
     }
 
+    // UPDATED: Modified to use random toggle
     function prepareQuestionBank(rawQuestions) {
       const qs = rawQuestions.map(q => ({
         question: q.question,
@@ -1551,16 +1611,19 @@
         correctIndex: q.correctIndex
       }));
 
-      shuffleArray(qs);
-
-      qs.forEach(q => {
-        const idxs = [0, 1, 2, 3];
-        shuffleArray(idxs);
-        const newOptions = idxs.map(i => q.options[i]);
-        const newCorrectIndex = idxs.indexOf(q.correctIndex);
-        q.options = newOptions;
-        q.correctIndex = newCorrectIndex;
-      });
+      // Only shuffle questions if random toggle is checked
+      if (randomToggleEl.checked) {
+        shuffleArray(qs);
+        
+        qs.forEach(q => {
+          const idxs = [0, 1, 2, 3];
+          shuffleArray(idxs);
+          const newOptions = idxs.map(i => q.options[i]);
+          const newCorrectIndex = idxs.indexOf(q.correctIndex);
+          q.options = newOptions;
+          q.correctIndex = newCorrectIndex;
+        });
+      }
 
       return qs;
     }
@@ -1765,7 +1828,7 @@
       finishBtn.style.display = "inline-block";
       finalScoreEl.style.display = "none";
       progressBarFillEl.style.width = "0%";
-      questionCounterEl.textContent = "Select a topic and click Start Quiz";
+      questionCounterEl.textContent = "Select a topic and click Load Topic";
       scoreMiniEl.textContent = "Score: 0";
       
       questions = [];
@@ -1832,6 +1895,7 @@
           return;
         }
 
+        // UPDATED: Pass the random toggle state to prepareQuestionBank
         questions = prepareQuestionBank(parsed);
         userAnswers = new Array(questions.length);
 
@@ -1843,6 +1907,9 @@
         nextBtn.style.display = "inline-block";
         previousBtn.style.display = "inline-block";
         finishBtn.style.display = "inline-block";
+        
+        // Update topic badge with question count
+        topicBadgeEl.textContent = `Topic: ${topic.name} (${questions.length} questions)`;
         
         if (timeLimitSet && topicTimeLimit > 0) {
           showTimerNotification();
@@ -1923,8 +1990,6 @@
       removeTimerNotification();
       
       currentTopicKey = key;
-      const topic = TOPICS[key];
-      topicBadgeEl.textContent = topic ? topic.name : "Topic";
       loadQuestionsForTopic(key);
     });
 
