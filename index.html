@@ -319,18 +319,20 @@
       50% { opacity: 0.7; }
     }
 
+    /* LEFT-ALIGNED TOPIC SELECTION SECTION */
     .topic-select-row {
       margin-bottom: 14px;
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start; /* Changed from center to flex-start */
     }
 
     .topic-select-row label {
       font-size: 0.9rem;
       color: #d1d5db;
+      white-space: nowrap;
     }
 
     select {
@@ -718,13 +720,25 @@
         text-align: center;
       }
       
+      /* Mobile adjustments for left-aligned topic section */
       .topic-select-row {
         flex-direction: column;
-        align-items: stretch;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      
+      .topic-select-row label,
+      .topic-select-row select,
+      .topic-select-row .start-btn {
+        width: 100%;
       }
       
       select {
         min-width: 0;
+        width: 100%;
+      }
+      
+      .start-btn {
         width: 100%;
       }
     }
@@ -755,6 +769,7 @@
       <!-- Logout button will be added here by JavaScript -->
     </div>
 
+    <!-- LEFT-ALIGNED TOPIC SELECTION SECTION -->
     <div class="topic-select-row">
       <label for="topic-select">Topic:</label>
       <select id="topic-select">
