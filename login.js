@@ -38,8 +38,8 @@ class QuizLogin {
         this.loginContainer.innerHTML = `
             <div class="login-box">
                 <div class="login-header">
-                    <div class="login-title">🔐 C&W JE / LDCE Login</div>
-                    <div class="login-subtitle">Enter your credentials to access the quiz</div>
+                    <div class="login-title">🔐 JE DPQ / LDCE Login</div>
+                    <div class="login-subtitle">Enter your credentials</div>
                 </div>
                 
                 <form id="login-form" class="login-form">
@@ -411,4 +411,5 @@ class QuizLogin {
 // Initialize login when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     window.quizLogin = new QuizLogin();
+
 });
