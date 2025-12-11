@@ -16,12 +16,12 @@
       padding: 0;
       background: #0f172a;
       color: #e5e7eb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       min-height: 100vh;
       background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
-      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
     /* ===== LOGIN STYLES ===== */
@@ -32,7 +32,6 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      margin: 0 auto;
     }
 
     .login-box {
@@ -234,7 +233,7 @@
       box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
       border: 1px solid rgba(148, 163, 184, 0.3);
       display: none;
-      margin: 20px auto;
+      margin: 20px;
     }
 
     /* Logout button in quiz header */
@@ -665,7 +664,7 @@
     @media (max-width: 700px) {
       body {
         padding: 15px;
-        display: block;
+        justify-content: flex-start;
       }
       
       #login-container, .quiz-container {
@@ -727,6 +726,16 @@
       select {
         min-width: 0;
         width: 100%;
+      }
+    }
+
+    @media (min-width: 701px) {
+      body {
+        padding: 40px 20px;
+      }
+      
+      #login-container, .quiz-container {
+        margin: 0 auto;
       }
     }
   </style>
