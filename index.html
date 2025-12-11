@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>JE DPQ / LDCE MCQ Practice-Created By Gobind Sharma</title>
+  <title>C&W JE / LDCE MCQ Practice - Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
+    /* ===== BASE STYLES ===== */
     * {
       box-sizing: border-box;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -19,8 +20,208 @@
       align-items: center;
       justify-content: center;
       min-height: 100vh;
+      background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
     }
 
+    /* ===== LOGIN STYLES ===== */
+    #login-container {
+      width: 100%;
+      max-width: 420px;
+      padding: 20px;
+    }
+
+    .login-box {
+      background: #020617;
+      border-radius: 18px;
+      padding: 30px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .login-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: #e5e7eb;
+      margin-bottom: 8px;
+    }
+
+    .login-subtitle {
+      font-size: 0.9rem;
+      color: #9ca3af;
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      font-size: 0.9rem;
+      color: #d1d5db;
+      font-weight: 500;
+    }
+
+    .form-group input {
+      background: #111827;
+      color: #e5e7eb;
+      border-radius: 10px;
+      border: 1px solid rgba(75, 85, 99, 0.9);
+      padding: 12px 16px;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+    .form-group input::placeholder {
+      color: #6b7280;
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: #9ca3af;
+      cursor: pointer;
+      padding: 4px;
+      font-size: 1rem;
+    }
+
+    .toggle-password:hover {
+      color: #e5e7eb;
+    }
+
+    .login-btn {
+      background: linear-gradient(to right, #3b82f6, #2563eb);
+      color: white;
+      border: none;
+      border-radius: 999px;
+      padding: 14px 24px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.4);
+    }
+
+    .login-btn:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.5);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .btn-loader {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .error-message {
+      background: rgba(239, 68, 68, 0.1);
+      color: #fca5a5;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      display: none;
+    }
+
+    .login-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(75, 85, 99, 0.3);
+      font-size: 0.85rem;
+    }
+
+    .attempts-counter {
+      color: #9ca3af;
+    }
+
+    .attempts-counter span {
+      color: #fbbf24;
+      font-weight: 600;
+    }
+
+    .demo-credentials {
+      color: #6b7280;
+      font-size: 0.8rem;
+    }
+
+    .locked-message {
+      background: rgba(245, 158, 11, 0.1);
+      color: #fbbf24;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      margin-top: 20px;
+    }
+
+    .locked-message span {
+      font-weight: 700;
+      color: #f59e0b;
+    }
+
+    /* Shake animation for error */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+      20%, 40%, 60%, 80% { transform: translateX(5px); }
+    }
+
+    .shake {
+      animation: shake 0.5s ease-in-out;
+    }
+
+    /* ===== QUIZ STYLES (existing styles with logout button) ===== */
     .quiz-container {
       background: #020617;
       border-radius: 18px;
@@ -29,8 +230,38 @@
       width: 100%;
       box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
       border: 1px solid rgba(148, 163, 184, 0.3);
+      display: none; /* Hidden by default, shown after login */
     }
 
+    /* Logout button in quiz header */
+    .logout-btn {
+      background: rgba(239, 68, 68, 0.1);
+      color: #fca5a5;
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: none; /* Hidden until login */
+    }
+
+    .logout-btn:hover {
+      background: rgba(239, 68, 68, 0.2);
+      transform: translateY(-1px);
+    }
+
+    .user-info {
+      font-size: 0.8rem;
+      color: #93c5fd;
+      background: rgba(59, 130, 246, 0.1);
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      display: none; /* Hidden until login */
+    }
+
+    /* Update quiz header to accommodate logout button */
     .quiz-header {
       display: flex;
       justify-content: space-between;
@@ -38,6 +269,10 @@
       margin-bottom: 12px;
       gap: 10px;
       flex-wrap: wrap;
+    }
+
+    .quiz-header > div:first-child {
+      flex: 1;
     }
 
     .title {
@@ -417,10 +652,6 @@
       margin-right: 8px;
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
     @media (max-width: 700px) {
       .quiz-container {
         margin: 10px;
@@ -452,17 +683,36 @@
         gap: 5px;
         align-items: flex-start;
       }
+      
+      #login-container {
+        padding: 15px;
+      }
+      
+      .login-box {
+        padding: 20px;
+      }
+      
+      .login-footer {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+      }
     }
   </style>
 </head>
 <body>
+  <!-- Login Container (shown by default) -->
+  <div id="login-container"></div>
+  
+  <!-- Quiz Container (hidden by default, shown after login) -->
   <div class="quiz-container">
     <div class="quiz-header">
       <div>
-        <div class="title">JE DPQ / LDCE MCQ Practice</div>
+        <div class="title">C&W JE / LDCE Multi-Topic MCQ Practice</div>
         <div class="subtitle">Created By Gobind Sharma</div>
       </div>
       <div class="badge" id="current-topic-badge">No topic selected</div>
+      <!-- Logout button will be added here by JavaScript -->
     </div>
 
     <div class="topic-select-row">
@@ -489,7 +739,7 @@
 
     <div class="question-box">
       <div id="question-text" class="question-text">
-        No topic selected. Please choose a topic and press "Start Quiz".
+        Please login to access the quiz.
       </div>
       <ul id="options-list" class="options"></ul>
       <div id="feedback" class="feedback"></div>
@@ -511,10 +761,14 @@
     </div>
   </div>
 
+  <!-- Load login system first -->
+  <script src="login.js"></script>
+  
+  <!-- Then load the quiz logic -->
   <script>
     // ========= GLOBAL VARIABLES =========
     let topicsData = null;
-    let BASE_ID = "";
+    let BASE_ID = "1hJSzOmZZilf3XR4SxlM-s_xPoq-4KkQKJ9vF8TGxSn4";
     let TOPICS = {};
 
     let questions = [];
@@ -524,11 +778,11 @@
     let questionsLoaded = false;
     let currentTopicKey = null;
     let userAnswers = [];
-    let topicTimeLimit = 0; // Time limit in minutes (from Time column)
-    let timeRemaining = 0; // Remaining time in milliseconds
+    let topicTimeLimit = 0;
+    let timeRemaining = 0;
     let timerInterval = null;
-    let timeLimitSet = false; // Flag to check if time limit is set for this topic
-    let timerNotification = null; // Reference to timer notification element
+    let timeLimitSet = false;
+    let timerNotification = null;
 
     const questionTextEl    = document.getElementById("question-text");
     const optionsListEl     = document.getElementById("options-list");
@@ -547,13 +801,54 @@
     const timerContainerEl  = document.getElementById("timer-container");
     const timerDisplayEl    = document.getElementById("timer-display");
 
+    // Function to reset quiz state (used by logout)
+    window.resetQuizState = function() {
+      questions = [];
+      currentIndex = 0;
+      score = 0;
+      hasAnswered = false;
+      questionsLoaded = false;
+      currentTopicKey = null;
+      userAnswers = [];
+      topicTimeLimit = 0;
+      timeRemaining = 0;
+      timeLimitSet = false;
+      
+      // Stop any running timer
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      
+      // Reset UI
+      topicSelectEl.innerHTML = '<option value="">-- Choose Topic --</option>';
+      topicSelectEl.disabled = false;
+      startBtnEl.disabled = false;
+      questionTextEl.textContent = "Please login to access the quiz.";
+      optionsListEl.innerHTML = "";
+      feedbackEl.textContent = "";
+      submitBtn.disabled = true;
+      nextBtn.disabled = true;
+      previousBtn.disabled = true;
+      finishBtn.disabled = true;
+      questionCounterEl.textContent = "Select a topic and click Start Quiz";
+      progressBarFillEl.style.width = "0%";
+      scoreMiniEl.textContent = "Score: 0";
+      finalScoreEl.style.display = "none";
+      timerContainerEl.style.display = "none";
+      topicBadgeEl.textContent = "No topic selected";
+      
+      // Remove timer notification if exists
+      if (timerNotification && timerNotification.parentNode) {
+        timerNotification.parentNode.removeChild(timerNotification);
+        timerNotification = null;
+      }
+    };
+
     // ---------- Initialize App ----------
 
     async function initializeApp() {
       try {
-        // Show loading state
-        topicSelectEl.innerHTML = '<option value="">Loading topics...</option>';
-        
         // Load topics from JSON file
         const response = await fetch('topics.json');
         if (!response.ok) throw new Error('Failed to load topics.json');
@@ -599,13 +894,11 @@
     function startTopicTimer() {
       if (!timeLimitSet || topicTimeLimit <= 0) return;
       
-      timeRemaining = topicTimeLimit * 60 * 1000; // Convert minutes to milliseconds
+      timeRemaining = topicTimeLimit * 60 * 1000;
       timerContainerEl.style.display = "flex";
       
-      // Update timer immediately
       updateTimerDisplay();
       
-      // Start interval to update timer every second
       timerInterval = setInterval(() => {
         timeRemaining -= 1000;
         
@@ -624,26 +917,21 @@
       const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
       
-      // Format as HH:MM:SS
       const formattedTime = 
         `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
       
       timerDisplayEl.textContent = formattedTime;
       
-      // Update timer label based on time remaining
       updateTimerLabel(hours, minutes);
       
-      // Add warning styles based on time remaining
       timerDisplayEl.classList.remove("timer-warning", "timer-critical");
       
-      // Warning at 25% of time remaining
       const warningThreshold = topicTimeLimit * 60 * 1000 * 0.25;
       
       if (timeRemaining <= warningThreshold && timeRemaining > 0) {
         timerDisplayEl.classList.add("timer-warning");
       }
       
-      // Critical at 10% of time remaining or less than 5 minutes
       const criticalThreshold = Math.min(topicTimeLimit * 60 * 1000 * 0.10, 5 * 60 * 1000);
       
       if (timeRemaining <= criticalThreshold && timeRemaining > 0) {
@@ -676,11 +964,9 @@
     }
 
     function showTimerNotification() {
-      // Remove any existing timer notification first
       removeTimerNotification();
       
       if (timeLimitSet && topicTimeLimit > 0) {
-        // Create new timer notification
         timerNotification = document.createElement("div");
         timerNotification.className = "timer-notification";
         timerNotification.innerHTML = `
@@ -688,7 +974,6 @@
           <span>Timer set: <strong>${topicTimeLimit} minutes</strong> for this quiz</span>
         `;
         
-        // Insert it before the question box
         const questionBox = document.querySelector(".question-box");
         questionBox.parentNode.insertBefore(timerNotification, questionBox);
       }
@@ -700,7 +985,6 @@
         timerNotification = null;
       }
       
-      // Also remove any timer notifications that might have been added directly to question box
       const existingNotifications = document.querySelectorAll(".timer-notification");
       existingNotifications.forEach(notification => {
         if (notification.parentNode) {
@@ -712,7 +996,6 @@
     function autoFinishQuiz() {
       if (!timeLimitSet) return;
       
-      // Show time's up message
       const timeUpMessage = document.createElement("div");
       timeUpMessage.className = "final-score";
       timeUpMessage.style.backgroundColor = "rgba(239, 68, 68, 0.1)";
@@ -722,13 +1005,10 @@
         Your ${topicTimeLimit}-minute time limit has expired.<br/><br/>
       `;
       
-      // Insert before final score
       finalScoreEl.parentNode.insertBefore(timeUpMessage, finalScoreEl);
       
-      // Show final results
       showFinalResults();
       
-      // Stop the timer
       stopTimer();
       removeTimerNotification();
     }
@@ -747,10 +1027,8 @@
       const result = [];
       if (lines.length <= 1) return result;
 
-      // Check if the CSV has headers
       const headers = lines[0].toLowerCase().split(',');
       
-      // Find column indices
       const questionIndex = headers.findIndex(h => h.includes('question'));
       const option1Index = headers.findIndex(h => h.includes('option1') || h.includes('option 1'));
       const option2Index = headers.findIndex(h => h.includes('option2') || h.includes('option 2'));
@@ -759,24 +1037,20 @@
       const correctIndex = headers.findIndex(h => h.includes('correct'));
       const timeIndex = headers.findIndex(h => h.includes('time'));
       
-      // Reset time limit for this topic
       topicTimeLimit = 0;
       timeLimitSet = false;
 
       for (let i = 1; i < lines.length; i++) {
         const row = lines[i].split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
         
-        // Check if we have a time value in the first row (could be for the whole topic)
         if (i === 1 && timeIndex >= 0 && timeIndex < row.length) {
           const timeValue = row[timeIndex].replace(/^"|"$/g, "").trim();
           if (timeValue && !isNaN(parseFloat(timeValue))) {
             topicTimeLimit = parseFloat(timeValue);
             timeLimitSet = true;
-            console.log(`Time limit set to ${topicTimeLimit} minutes for this topic`);
           }
         }
         
-        // Skip if we don't have enough columns for a question
         if (row.length < Math.max(questionIndex, option1Index, option2Index, option3Index, option4Index, correctIndex) + 1) {
           continue;
         }
@@ -788,7 +1062,6 @@
         const o4  = row[option4Index] ? row[option4Index].replace(/^"|"$/g, "").trim() : "";
         const raw = row[correctIndex] ? row[correctIndex].replace(/^"|"$/g, "").trim() : "";
 
-        // Skip empty questions
         if (!q) continue;
 
         let correctIdx = 0;
@@ -866,7 +1139,6 @@
         input.value = idx;
         input.id = `opt-${idx}`;
 
-        // Restore user's previous selection if exists
         if (userAnswers[currentIndex] !== undefined) {
           input.checked = (userAnswers[currentIndex] === idx);
         }
@@ -883,30 +1155,26 @@
           const radio = li.querySelector("input");
           if (radio) {
             radio.checked = true;
-            userAnswers[currentIndex] = idx; // Save user's selection
+            userAnswers[currentIndex] = idx;
           }
         });
       });
 
-      // Update button states
       submitBtn.disabled = false;
       submitBtn.textContent = "Submit";
       previousBtn.disabled = (currentIndex === 0);
       nextBtn.disabled = false;
       finishBtn.disabled = false;
       
-      // If user has already answered this question, show the answer
       if (userAnswers[currentIndex] !== undefined) {
         const selectedIndex = userAnswers[currentIndex];
         const isCorrect = (selectedIndex === q.correctIndex);
         
-        // Show correctness
         showCorrectness(selectedIndex);
         lockOptions();
         submitBtn.disabled = true;
         hasAnswered = true;
         
-        // Update feedback
         if (isCorrect) {
           feedbackEl.textContent = "✅ Correct!";
           feedbackEl.className = "feedback correct";
@@ -915,7 +1183,6 @@
           feedbackEl.className = "feedback incorrect";
         }
       } else {
-        // Clear feedback for unanswered questions
         feedbackEl.textContent = "";
       }
     }
@@ -966,11 +1233,9 @@
     }
 
     function showFinalResults() {
-      // Stop timer if it's running
       stopTimer();
       removeTimerNotification();
       
-      // Calculate final score based on user answers
       let finalScore = 0;
       for (let i = 0; i < questions.length; i++) {
         if (userAnswers[i] !== undefined && userAnswers[i] === questions[i].correctIndex) {
@@ -988,7 +1253,6 @@
       finishBtn.style.display = "none";
       finalScoreEl.style.display = "block";
       
-      // Add timer info if time limit was set
       const timerInfo = timeLimitSet ? 
         `<br/><small style="color: #9ca3af;">Time limit: ${topicTimeLimit} minutes | ${formatTimeTaken()}</small>` : '';
       
@@ -1030,7 +1294,7 @@
     function resetQuizUI() {
       topicSelectEl.value = "";
       topicBadgeEl.textContent = "No topic selected";
-      questionTextEl.textContent = "No topic selected. Please choose a topic and press 'Start Quiz'.";
+      questionTextEl.textContent = "Select a topic and start quiz";
       optionsListEl.innerHTML = "";
       feedbackEl.textContent = "";
       submitBtn.style.display = "inline-block";
@@ -1042,7 +1306,6 @@
       questionCounterEl.textContent = "Select a topic and click Start Quiz";
       scoreMiniEl.textContent = "Score: 0";
       
-      // Reset all variables
       questions = [];
       currentIndex = 0;
       score = 0;
@@ -1066,7 +1329,6 @@
       finishBtn.style.display = "inline-block";
       finalScoreEl.style.display = "none";
       
-      // Restart timer if time limit is set for this topic
       if (timeLimitSet && topicTimeLimit > 0) {
         startTopicTimer();
         showTimerNotification();
@@ -1082,7 +1344,6 @@
       if (!topic) return;
 
       try {
-        // Clean up any existing timer notifications first
         removeTimerNotification();
         
         questionTextEl.textContent = "Loading questions from Google Sheet…";
@@ -1096,7 +1357,6 @@
         progressBarFillEl.style.width = "0%";
         questionCounterEl.textContent = "Loading…";
 
-        // Hide timer initially
         timerContainerEl.style.display = "none";
 
         const res = await fetch(topic.url);
@@ -1122,11 +1382,8 @@
         previousBtn.style.display = "inline-block";
         finishBtn.style.display = "inline-block";
         
-        // Show timer notification if time limit is set
         if (timeLimitSet && topicTimeLimit > 0) {
           showTimerNotification();
-          
-          // Start timer
           startTopicTimer();
         }
         
@@ -1154,7 +1411,7 @@
 
       const q = questions[currentIndex];
       hasAnswered = true;
-      userAnswers[currentIndex] = selectedIndex; // Save answer
+      userAnswers[currentIndex] = selectedIndex;
 
       if (selectedIndex === q.correctIndex) {
         score++;
@@ -1200,7 +1457,6 @@
         return;
       }
       
-      // Stop any existing timer and clean up notifications
       stopTimer();
       removeTimerNotification();
       
