@@ -91,7 +91,7 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      gap: 15px;
+      gap: 12px;
       padding: 3px 0;
     }
 
@@ -99,16 +99,18 @@
       font-size: 0.85rem;
       color: #93c5fd;
       background: rgba(59, 130, 246, 0.15);
-      padding: 5px 15px;
+      padding: 5px 12px;
       border-radius: 999px;
       border: 1px solid rgba(59, 130, 246, 0.3);
       white-space: nowrap;
-      max-width: 200px;
+      max-width: 180px;
       overflow: hidden;
       text-overflow: ellipsis;
       display: flex;
       align-items: center;
       gap: 6px;
+      flex-shrink: 1;
+      min-width: 0;
     }
 
     .logout-btn {
@@ -116,15 +118,15 @@
       color: #fca5a5;
       border: 1px solid rgba(239, 68, 68, 0.3);
       border-radius: 999px;
-      padding: 5px 15px;
+      padding: 5px 12px;
       font-size: 0.85rem;
       cursor: pointer;
       transition: all 0.2s ease;
       white-space: nowrap;
-      min-width: fit-content;
       display: flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
+      flex-shrink: 0;
     }
 
     .logout-btn:hover {
@@ -405,12 +407,6 @@
       align-items: center;
     }
 
-    .topic-row label {
-      font-size: 0.9rem;
-      color: #d1d5db;
-      white-space: nowrap;
-    }
-
     .topic-select {
       background: rgba(15, 23, 42, 0.7);
       color: #e5e7eb;
@@ -485,6 +481,62 @@
       width: 0%;
       background: linear-gradient(to right, #22c55e, #3b82f6);
       transition: width 0.3s ease;
+    }
+
+    /* TIMER CONTAINER - Updated for mobile */
+    .timer-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      background: rgba(59, 130, 246, 0.05);
+      border-radius: 12px;
+      border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .timer-label {
+      font-size: 0.85rem;
+      color: #93c5fd;
+      white-space: nowrap;
+      margin-right: 10px;
+    }
+
+    .timer-display {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #60a5fa;
+      font-family: 'Courier New', monospace;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .timer-warning {
+      color: #fbbf24;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .timer-critical {
+      color: #ef4444;
+      animation: pulse 0.5s infinite;
+    }
+
+    .timer-notification {
+      margin-bottom: 10px;
+      padding: 8px 12px;
+      background: rgba(245, 158, 11, 0.1);
+      border-radius: 10px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      font-size: 0.85rem;
+      color: #fbbf24;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     /* QUESTION BOX - Updated background */
@@ -565,59 +617,6 @@
 
     .feedback.incorrect {
       color: #fb7185;
-    }
-
-    /* TIMER CONTAINER */
-    .timer-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      padding: 8px 12px;
-      background: rgba(59, 130, 246, 0.1);
-      border-radius: 12px;
-      border: 1px solid rgba(59, 130, 246, 0.2);
-    }
-
-    .timer-label {
-      font-size: 0.85rem;
-      color: #93c5fd;
-    }
-
-    .timer-display {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #60a5fa;
-      font-family: 'Courier New', monospace;
-      letter-spacing: 1px;
-    }
-
-    .timer-warning {
-      color: #fbbf24;
-      animation: blink 1s infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    .timer-critical {
-      color: #ef4444;
-      animation: pulse 0.5s infinite;
-    }
-
-    .timer-notification {
-      margin-bottom: 10px;
-      padding: 8px 12px;
-      background: rgba(245, 158, 11, 0.1);
-      border-radius: 10px;
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      font-size: 0.85rem;
-      color: #fbbf24;
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
     /* CONTROLS LAYOUT */
@@ -849,18 +848,24 @@
       }
       
       .header-bottom {
-        gap: 10px;
+        gap: 8px;
+        justify-content: space-between;
+        padding: 3px 0;
       }
       
       .user-info {
         font-size: 0.75rem;
-        padding: 4px 10px;
-        max-width: 150px;
+        padding: 4px 8px;
+        max-width: 140px;
+        min-width: 0;
+        flex: 1;
       }
       
       .logout-btn {
         font-size: 0.75rem;
-        padding: 4px 10px;
+        padding: 4px 8px;
+        gap: 3px;
+        flex-shrink: 0;
       }
       
       .main-content {
@@ -918,10 +923,6 @@
         gap: 8px;
       }
       
-      .topic-row label {
-        text-align: center;
-      }
-      
       .topic-row .topic-select,
       .topic-row .start-btn {
         width: 100%;
@@ -936,14 +937,29 @@
         width: 100%;
       }
       
+      /* Timer container mobile fix - keep in one line */
       .timer-container {
-        flex-direction: column;
+        flex-direction: row;
         gap: 5px;
-        align-items: flex-start;
+        align-items: center;
+        padding: 6px 10px;
+      }
+      
+      .timer-label {
+        font-size: 0.8rem;
+        margin-right: 5px;
+        white-space: nowrap;
+        flex-shrink: 0;
       }
       
       .timer-display {
-        font-size: 1rem;
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        flex: 1;
+        min-width: 0;
+        text-align: right;
       }
       
       .question-box {
@@ -1015,16 +1031,19 @@
       .user-info {
         max-width: 120px;
         font-size: 0.7rem;
-        padding: 3px 8px;
+        padding: 3px 6px;
+        gap: 3px;
       }
       
       .logout-btn {
         font-size: 0.7rem;
-        padding: 3px 8px;
+        padding: 3px 6px;
+        gap: 2px;
       }
       
       .main-content {
         padding: 10px;
+        margin-top: 85px;
       }
       
       .quiz-container {
@@ -1036,8 +1055,37 @@
       }
       
       .header-bottom {
-        flex-wrap: wrap;
-        justify-content: space-around;
+        gap: 6px;
+      }
+      
+      .timer-label {
+        font-size: 0.75rem;
+      }
+      
+      .timer-display {
+        font-size: 0.85rem;
+      }
+    }
+    
+    /* For extra small screens */
+    @media (max-width: 350px) {
+      .user-info {
+        max-width: 100px;
+        font-size: 0.65rem;
+        padding: 3px 5px;
+      }
+      
+      .logout-btn {
+        font-size: 0.65rem;
+        padding: 3px 5px;
+      }
+      
+      .timer-label {
+        font-size: 0.7rem;
+      }
+      
+      .timer-display {
+        font-size: 0.8rem;
       }
     }
   </style>
@@ -1078,7 +1126,6 @@
         </div>
         
         <div class="topic-row">
-          <label for="topic-select">Select Topic:</label>
           <select id="topic-select" class="topic-select">
             <option value="">Loading topics...</option>
           </select>
