@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>JE-LDCE/DPQ MCQ Practice - Login</title>
+  <title>JE-LDCE/DPQ MCQ Practice</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     /* ===== BASE STYLES ===== */
@@ -21,96 +21,124 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
     }
 
-    /* ===== FIXED HEADER ===== */
+    /* ===== FIXED HEADER - COMPACT VERSION ===== */
     .fixed-header {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
-      background: rgba(2, 6, 23, 0.95);
+      background: rgba(2, 6, 23, 0.98);
       backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(148, 163, 184, 0.3);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
       z-index: 1000;
-      padding: 12px 20px;
+      padding: 8px 16px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     }
 
     .header-content {
+      width: 100%;
       max-width: 1200px;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 15px;
+      gap: 12px;
     }
 
-    .header-left {
+    .header-center {
       flex: 1;
+      text-align: center;
       min-width: 0;
+      overflow: hidden;
     }
 
     .header-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #e5e7eb;
+      font-size: 1rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, #3b82f6 0%, #22c55e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      line-height: 1.2;
+      margin: 0;
+      text-align: center;
     }
 
     .header-subtitle {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: #9ca3af;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      line-height: 1.2;
+      text-align: center;
+      margin-top: 2px;
     }
 
     .header-right {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex-shrink: 0;
     }
 
-    .user-badge {
+    .user-info {
       font-size: 0.8rem;
-      padding: 4px 12px;
-      border-radius: 999px;
-      background: rgba(59, 130, 246, 0.1);
       color: #93c5fd;
-      border: 1px solid rgba(37, 99, 235, 0.5);
+      background: rgba(59, 130, 246, 0.15);
+      padding: 5px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(59, 130, 246, 0.3);
       white-space: nowrap;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .logout-btn {
-      background: rgba(239, 68, 68, 0.1);
+      background: rgba(239, 68, 68, 0.15);
       color: #fca5a5;
-      border: 1px solid rgba(239, 68, 68, 0.5);
+      border: 1px solid rgba(239, 68, 68, 0.3);
       border-radius: 999px;
-      padding: 6px 14px;
+      padding: 5px 12px;
       font-size: 0.8rem;
       cursor: pointer;
       transition: all 0.2s ease;
       white-space: nowrap;
+      min-width: fit-content;
     }
 
     .logout-btn:hover {
-      background: rgba(239, 68, 68, 0.2);
+      background: rgba(239, 68, 68, 0.25);
       transform: translateY(-1px);
+    }
+
+    /* ===== MAIN CONTENT AREA ===== */
+    .main-content {
+      width: 100%;
+      max-width: 720px;
+      margin-top: 60px; /* Header height */
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
     }
 
     /* ===== LOGIN STYLES ===== */
     #login-container {
       width: 100%;
-      max-width: 420px;
-      padding: 20px;
       display: flex;
       justify-content: center;
       align-items: center;
-      margin-top: 60px; /* Account for fixed header */
+      margin-top: 20px;
     }
 
     .login-box {
@@ -120,6 +148,7 @@
       box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
       border: 1px solid rgba(148, 163, 184, 0.3);
       width: 100%;
+      max-width: 420px;
     }
 
     .login-header {
@@ -132,11 +161,16 @@
       font-weight: 600;
       color: #e5e7eb;
       margin-bottom: 8px;
+      background: linear-gradient(90deg, #3b82f6 0%, #22c55e 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .login-subtitle {
       font-size: 0.9rem;
       color: #9ca3af;
+      text-align: center;
     }
 
     .login-form {
@@ -165,6 +199,7 @@
       padding: 12px 16px;
       font-size: 0.95rem;
       transition: all 0.2s ease;
+      width: 100%;
     }
 
     .form-group input:focus {
@@ -179,6 +214,7 @@
 
     .password-wrapper {
       position: relative;
+      width: 100%;
     }
 
     .toggle-password {
@@ -307,12 +343,10 @@
       background: #020617;
       border-radius: 18px;
       padding: 20px 22px;
-      max-width: 720px;
-      width: 100%;
       box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
       border: 1px solid rgba(148, 163, 184, 0.3);
       display: none;
-      margin: 80px 20px 20px; /* Top margin accounts for fixed header */
+      width: 100%;
     }
 
     /* TOPIC SELECTION SECTION */
@@ -721,36 +755,56 @@
     /* RESPONSIVE STYLES */
     @media (max-width: 700px) {
       body {
-        padding: 15px;
+        padding: 0;
         justify-content: flex-start;
       }
       
       .fixed-header {
-        padding: 10px 15px;
+        padding: 8px 12px;
+        height: 55px;
       }
       
       .header-content {
-        flex-direction: column;
-        align-items: stretch;
         gap: 8px;
       }
       
-      .header-right {
-        width: 100%;
-        justify-content: space-between;
+      .header-title {
+        font-size: 0.95rem;
       }
       
-      #login-container, .quiz-container {
-        margin: 70px auto 20px;
-        width: 95%;
+      .header-subtitle {
+        font-size: 0.65rem;
+      }
+      
+      .user-info {
+        font-size: 0.75rem;
+        padding: 4px 8px;
+        max-width: 120px;
+      }
+      
+      .logout-btn {
+        font-size: 0.75rem;
+        padding: 4px 10px;
+      }
+      
+      .main-content {
+        margin-top: 55px;
+        padding: 12px;
+        gap: 15px;
       }
       
       .quiz-container {
         padding: 15px;
+        border-radius: 14px;
       }
       
       .login-box {
         padding: 20px;
+        margin: 0 12px;
+      }
+      
+      .login-title {
+        font-size: 1.2rem;
       }
       
       .controls {
@@ -766,6 +820,8 @@
       button {
         flex: 1;
         min-width: 0;
+        font-size: 0.85rem;
+        padding: 8px 12px;
       }
       
       .topic-info {
@@ -777,6 +833,7 @@
       .topic-name, .question-count {
         width: 100%;
         text-align: center;
+        font-size: 0.9rem;
       }
       
       .topic-row {
@@ -785,7 +842,10 @@
         gap: 8px;
       }
       
-      .topic-row label,
+      .topic-row label {
+        text-align: center;
+      }
+      
       .topic-row .topic-select,
       .topic-row .start-btn {
         width: 100%;
@@ -806,8 +866,22 @@
         align-items: flex-start;
       }
       
-      #login-container {
-        padding: 15px;
+      .timer-display {
+        font-size: 1rem;
+      }
+      
+      .question-box {
+        padding: 12px;
+        min-height: 120px;
+      }
+      
+      .question-text {
+        font-size: 0.95rem;
+      }
+      
+      .option {
+        padding: 7px 8px;
+        font-size: 0.9rem;
       }
       
       .login-footer {
@@ -819,11 +893,46 @@
 
     @media (min-width: 701px) {
       body {
-        padding: 40px 20px;
+        padding: 0;
       }
       
-      #login-container, .quiz-container {
-        margin: 80px auto 20px;
+      .main-content {
+        margin: 60px auto 20px;
+        padding: 20px;
+      }
+    }
+    
+    /* For very small screens */
+    @media (max-width: 400px) {
+      .header-title {
+        font-size: 0.85rem;
+      }
+      
+      .header-subtitle {
+        font-size: 0.6rem;
+      }
+      
+      .user-info {
+        max-width: 100px;
+        font-size: 0.7rem;
+        padding: 3px 6px;
+      }
+      
+      .logout-btn {
+        font-size: 0.7rem;
+        padding: 3px 8px;
+      }
+      
+      .main-content {
+        padding: 10px;
+      }
+      
+      .quiz-container {
+        padding: 12px;
+      }
+      
+      .login-box {
+        padding: 15px;
       }
     }
   </style>
@@ -832,80 +941,83 @@
   <!-- Fixed Header -->
   <div class="fixed-header" style="display: none;">
     <div class="header-content">
-      <div class="header-left">
+      <div class="header-center">
         <div class="header-title">DPQ / LDCE (JE Examination)</div>
-        <div class="header-subtitle">Created By Gobind Sharma • Logged in as: <span id="header-logged-in-user">Guest</span></div>
+        <div class="header-subtitle">Created by Gobind Sharma</div>
       </div>
       <div class="header-right">
-        <div class="user-badge" id="header-topic-badge">No topic selected</div>
-        <button class="logout-btn" id="header-logout-btn">Logout</button>
+        <div class="user-info" id="header-user-info" style="display: none;">User: <span id="header-username">Guest</span></div>
+        <button class="logout-btn" id="header-logout-btn" style="display: none;">Logout</button>
       </div>
     </div>
   </div>
   
-  <!-- Login Container (shown by default) -->
-  <div id="login-container"></div>
-  
-  <!-- Quiz Container (hidden by default, shown after login) -->
-  <div class="quiz-container">
-    <!-- TOPIC SELECTION SECTION -->
-    <div class="topic-section">
-      <div class="topic-info">
-        <div class="topic-name" id="quiz-topic-name">No topic selected</div>
-        <div class="question-count" id="quiz-question-count">0 questions</div>
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Login Container (shown by default) -->
+    <div id="login-container"></div>
+    
+    <!-- Quiz Container (hidden by default, shown after login) -->
+    <div class="quiz-container">
+      <!-- TOPIC SELECTION SECTION -->
+      <div class="topic-section">
+        <div class="topic-info">
+          <div class="topic-name" id="quiz-topic-name">No topic selected</div>
+          <div class="question-count" id="quiz-question-count">0 questions</div>
+        </div>
+        
+        <div class="topic-row">
+          <label for="topic-select">Select Topic:</label>
+          <select id="topic-select" class="topic-select">
+            <option value="">Loading topics...</option>
+          </select>
+          <button class="start-btn" id="start-btn" disabled>Load Topic</button>
+        </div>
       </div>
-      
-      <div class="topic-row">
-        <label for="topic-select">Select Topic:</label>
-        <select id="topic-select" class="topic-select">
-          <option value="">Loading topics...</option>
-        </select>
-        <button class="start-btn" id="start-btn" disabled>Load Topic</button>
+
+      <!-- Timer Container -->
+      <div id="timer-container" class="timer-container" style="display: none;">
+        <div class="timer-label">⏰ Time Remaining:</div>
+        <div id="timer-display" class="timer-display">00:00:00</div>
       </div>
-    </div>
 
-    <!-- Timer Container -->
-    <div id="timer-container" class="timer-container" style="display: none;">
-      <div class="timer-label">⏰ Time Remaining:</div>
-      <div id="timer-display" class="timer-display">00:00:00</div>
-    </div>
-
-    <!-- RANDOMIZE TOGGLE -->
-    <div class="toggle-row">
-      <input type="checkbox" id="random-toggle" checked />
-      <label for="random-toggle">Randomize questions & options</label>
-    </div>
-
-    <div class="progress">
-      <div id="question-counter">Select a topic and click Load Topic</div>
-      <div class="progress-bar">
-        <div id="progress-bar-fill" class="progress-bar-fill"></div>
+      <!-- RANDOMIZE TOGGLE -->
+      <div class="toggle-row">
+        <input type="checkbox" id="random-toggle" checked />
+        <label for="random-toggle">Randomize questions & options</label>
       </div>
-      <div id="score-mini">Score: 0</div>
-    </div>
 
-    <div class="question-box">
-      <div id="question-text" class="question-text">
-        Please login to access the quiz.
+      <div class="progress">
+        <div id="question-counter">Select a topic and click Load Topic</div>
+        <div class="progress-bar">
+          <div id="progress-bar-fill" class="progress-bar-fill"></div>
+        </div>
+        <div id="score-mini">Score: 0</div>
       </div>
-      <ul id="options-list" class="options"></ul>
-      <div id="feedback" class="feedback"></div>
-    </div>
 
-    <!-- BUTTON LAYOUT -->
-    <div class="controls">
-      <div class="left-controls">
-        <button id="previous-btn" disabled>← Previous</button>
-        <button id="next-btn" disabled>Next →</button>
+      <div class="question-box">
+        <div id="question-text" class="question-text">
+          Please login to access the quiz.
+        </div>
+        <ul id="options-list" class="options"></ul>
+        <div id="feedback" class="feedback"></div>
       </div>
-      <div class="right-controls">
-        <button id="submit-btn" disabled>Submit</button>
-        <button id="finish-btn" disabled>Finish</button>
-      </div>
-    </div>
 
-    <div class="score-box">
-      <div id="final-score" class="final-score" style="display:none;"></div>
+      <!-- BUTTON LAYOUT -->
+      <div class="controls">
+        <div class="left-controls">
+          <button id="previous-btn" disabled>← Previous</button>
+          <button id="next-btn" disabled>Next →</button>
+        </div>
+        <div class="right-controls">
+          <button id="submit-btn" disabled>Submit</button>
+          <button id="finish-btn" disabled>Finish</button>
+        </div>
+      </div>
+
+      <div class="score-box">
+        <div id="final-score" class="final-score" style="display:none;"></div>
+      </div>
     </div>
   </div>
 
@@ -924,8 +1036,8 @@
             this.lockDuration = 30000;
             
             this.fixedHeader = null;
-            this.headerLoggedInUserEl = null;
-            this.headerTopicBadgeEl = null;
+            this.headerUserInfoEl = null;
+            this.headerUsernameEl = null;
             this.headerLogoutBtn = null;
             this.loginContainer = null;
             this.quizContainer = null;
@@ -933,8 +1045,6 @@
             this.usernameInput = null;
             this.passwordInput = null;
             this.loginBtn = null;
-            this.logoutBtn = null;
-            this.loggedInUserEl = null;
             this.errorMsg = null;
             this.lockedUntil = null;
             
@@ -955,7 +1065,7 @@
                 <div class="login-box">
                     <div class="login-header">
                         <div class="login-title">🔐 JE DPQ / LDCE Login</div>
-                        <div class="login-subtitle">Enter your credentials to access</div>
+                        <div class="login-subtitle">Created by Gobind Sharma</div>
                     </div>
                     
                     <form id="login-form" class="login-form">
@@ -1002,10 +1112,9 @@
             this.quizContainer = document.querySelector('.quiz-container');
             this.fixedHeader = document.querySelector('.fixed-header');
             
-            if (this.quizContainer) {
-                this.quizContainer.style.display = 'none';
-                document.body.insertBefore(this.loginContainer, this.quizContainer);
-            }
+            // Insert login container into main content
+            const mainContent = document.querySelector('.main-content');
+            mainContent.insertBefore(this.loginContainer, this.quizContainer);
 
             // Cache DOM elements
             this.loginForm = document.getElementById('login-form');
@@ -1019,8 +1128,8 @@
             this.lockTimer = document.getElementById('lock-timer');
             
             // Get header elements
-            this.headerLoggedInUserEl = document.getElementById('header-logged-in-user');
-            this.headerTopicBadgeEl = document.getElementById('header-topic-badge');
+            this.headerUserInfoEl = document.getElementById('header-user-info');
+            this.headerUsernameEl = document.getElementById('header-username');
             this.headerLogoutBtn = document.getElementById('header-logout-btn');
         }
 
@@ -1172,8 +1281,10 @@
             this.quizContainer.style.display = 'block';
             
             // Update the header with logged in user
-            if (this.headerLoggedInUserEl) {
-                this.headerLoggedInUserEl.textContent = this.currentUser;
+            if (this.headerUserInfoEl && this.headerUsernameEl) {
+                this.headerUserInfoEl.style.display = 'block';
+                this.headerUsernameEl.textContent = this.currentUser;
+                this.headerLogoutBtn.style.display = 'block';
             }
             
             // Initialize quiz
@@ -1203,11 +1314,11 @@
                 this.loginContainer.style.display = 'block';
                 
                 // Reset header display
-                if (this.headerLoggedInUserEl) {
-                    this.headerLoggedInUserEl.textContent = 'Guest';
+                if (this.headerUserInfoEl) {
+                    this.headerUserInfoEl.style.display = 'none';
                 }
-                if (this.headerTopicBadgeEl) {
-                    this.headerTopicBadgeEl.textContent = 'No topic selected';
+                if (this.headerLogoutBtn) {
+                    this.headerLogoutBtn.style.display = 'none';
                 }
                 
                 // Reset quiz state
@@ -1238,8 +1349,10 @@
                         this.currentUser = session.username;
                         
                         // Update header with logged in user
-                        if (this.headerLoggedInUserEl) {
-                            this.headerLoggedInUserEl.textContent = this.currentUser;
+                        if (this.headerUserInfoEl && this.headerUsernameEl) {
+                            this.headerUserInfoEl.style.display = 'block';
+                            this.headerUsernameEl.textContent = this.currentUser;
+                            this.headerLogoutBtn.style.display = 'block';
                         }
                         
                         this.showQuiz();
@@ -1326,12 +1439,6 @@
             
             updateTimer();
         }
-        
-        updateTopicBadge(topicName, questionCount) {
-            if (this.headerTopicBadgeEl) {
-                this.headerTopicBadgeEl.textContent = `${topicName} (${questionCount} Q)`;
-            }
-        }
     }
   </script>
   
@@ -1416,11 +1523,6 @@
       if (timerNotification && timerNotification.parentNode) {
         timerNotification.parentNode.removeChild(timerNotification);
         timerNotification = null;
-      }
-      
-      // Update header badge
-      if (window.quizLogin && window.quizLogin.updateTopicBadge) {
-        window.quizLogin.updateTopicBadge("No topic selected", 0);
       }
     };
 
@@ -1899,11 +2001,6 @@
       topicTimeLimit = 0;
       timeRemaining = 0;
       timeLimitSet = false;
-      
-      // Update header badge
-      if (window.quizLogin && window.quizLogin.updateTopicBadge) {
-        window.quizLogin.updateTopicBadge("No topic selected", 0);
-      }
     }
 
     function restartQuiz() {
@@ -1974,11 +2071,6 @@
         currentTopicKey = topicKey;
         quizTopicNameEl.textContent = topic.name;
         quizQuestionCountEl.textContent = `${questions.length} questions`;
-        
-        // Update header badge
-        if (window.quizLogin && window.quizLogin.updateTopicBadge) {
-          window.quizLogin.updateTopicBadge(topic.name, questions.length);
-        }
         
         if (timeLimitSet && topicTimeLimit > 0) {
           showTimerNotification();
