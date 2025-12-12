@@ -1,2315 +1,460 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>JE-LDCE/DPQ MCQ Practice</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    /* ===== BASE STYLES ===== */
-    * {
-      box-sizing: border-box;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      background: #0f172a;
-      color: #e5e7eb;
-      min-height: 100vh;
-      background-image: radial-gradient(circle at 50% 50%, #1e293b 0%, #0f172a 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    /* ===== FIXED HEADER - COMPACT VERSION ===== */
-    .fixed-header {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background: rgba(2, 6, 23, 0.98);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-      z-index: 1000;
-      padding: 8px 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    }
-
-    .header-content {
-      width: 100%;
-      max-width: 1200px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .header-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .header-center {
-      flex: 1;
-      text-align: center;
-      min-width: 0;
-      overflow: hidden;
-    }
-
-    .header-title {
-      font-size: 1.3rem;
-      font-weight: 700;
-      background: linear-gradient(90deg, #3b82f6 0%, #22c55e 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      line-height: 1.2;
-      margin: 0;
-      text-align: center;
-      letter-spacing: 0.5px;
-    }
-
-    .header-subtitle {
-      font-size: 0.8rem;
-      color: #9ca3af;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      line-height: 1.2;
-      text-align: center;
-      margin-top: 2px;
-    }
-
-    .header-bottom {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 15px;
-      padding: 3px 0;
-    }
-
-    .user-info {
-      font-size: 0.85rem;
-      color: #93c5fd;
-      background: rgba(59, 130, 246, 0.15);
-      padding: 5px 15px;
-      border-radius: 999px;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-      white-space: nowrap;
-      max-width: 200px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .logout-btn {
-      background: rgba(239, 68, 68, 0.15);
-      color: #fca5a5;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      border-radius: 999px;
-      padding: 5px 15px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      white-space: nowrap;
-      min-width: fit-content;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .logout-btn:hover {
-      background: rgba(239, 68, 68, 0.25);
-      transform: translateY(-1px);
-    }
-
-    /* ===== MAIN CONTENT AREA ===== */
-    .main-content {
-      width: 100%;
-      max-width: 720px;
-      margin-top: 90px; /* Increased for two-row header */
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    /* ===== LOGIN STYLES ===== */
-    #login-container {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 20px;
-    }
-
-    .login-box {
-      background: #020617;
-      border-radius: 18px;
-      padding: 30px;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      width: 100%;
-      max-width: 420px;
-    }
-
-    .login-header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .login-title {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #e5e7eb;
-      margin-bottom: 8px;
-      background: linear-gradient(90deg, #3b82f6 0%, #22c55e 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      letter-spacing: 0.5px;
-    }
-
-    .login-subtitle {
-      font-size: 0.95rem;
-      color: #9ca3af;
-      text-align: center;
-    }
-
-    .login-form {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .form-group label {
-      font-size: 0.9rem;
-      color: #d1d5db;
-      font-weight: 500;
-    }
-
-    .form-group input {
-      background: #111827;
-      color: #e5e7eb;
-      border-radius: 10px;
-      border: 1px solid rgba(75, 85, 99, 0.9);
-      padding: 12px 16px;
-      font-size: 0.95rem;
-      transition: all 0.2s ease;
-      width: 100%;
-    }
-
-    .form-group input:focus {
-      outline: none;
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-    }
-
-    .form-group input::placeholder {
-      color: #6b7280;
-    }
-
-    .password-wrapper {
-      position: relative;
-      width: 100%;
-    }
-
-    .toggle-password {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      background: transparent;
-      border: none;
-      color: #9ca3af;
-      cursor: pointer;
-      padding: 4px;
-      font-size: 1rem;
-    }
-
-    .toggle-password:hover {
-      color: #e5e7eb;
-    }
-
-    .login-btn {
-      background: linear-gradient(to right, #3b82f6, #2563eb);
-      color: white;
-      border: none;
-      border-radius: 999px;
-      padding: 14px 24px;
-      font-size: 1rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      margin-top: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.4);
-      width: 100%;
-    }
-
-    .login-btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.5);
-    }
-
-    .login-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .btn-loader {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(255, 255, 255, 0.3);
-      border-radius: 50%;
-      border-top-color: white;
-      animation: spin 1s ease-in-out infinite;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .error-message {
-      background: rgba(239, 68, 68, 0.1);
-      color: #fca5a5;
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      display: none;
-    }
-
-    .login-footer {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      margin-top: 20px;
-      padding-top: 20px;
-      border-top: 1px solid rgba(75, 85, 99, 0.3);
-      font-size: 0.85rem;
-    }
-
-    .attempts-counter {
-      color: #9ca3af;
-      text-align: center;
-    }
-
-    .attempts-counter span {
-      color: #fbbf24;
-      font-weight: 600;
-    }
-
-    .locked-message {
-      background: rgba(245, 158, 11, 0.1);
-      color: #fbbf24;
-      padding: 15px;
-      border-radius: 10px;
-      text-align: center;
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      margin-top: 20px;
-    }
-
-    .locked-message span {
-      font-weight: 700;
-      color: #f59e0b;
-    }
-
-    /* Shake animation for error */
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-      20%, 40%, 60%, 80% { transform: translateX(5px); }
-    }
-
-    .shake {
-      animation: shake 0.5s ease-in-out;
-    }
-
-    /* ===== QUIZ STYLES ===== */
-    .quiz-container {
-      background: #020617;
-      border-radius: 18px;
-      padding: 20px 22px;
-      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      display: none;
-      width: 100%;
-    }
-
-    /* TOPIC SELECTION SECTION - Updated background */
-    .topic-section {
-      margin-bottom: 20px;
-      padding: 15px;
-      background: rgba(15, 23, 42, 0.7);
-      border-radius: 12px;
-      border: 1px solid rgba(75, 85, 99, 0.5);
-    }
-
-    .topic-info {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .topic-name {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #3b82f6;
-      background: rgba(59, 130, 246, 0.15);
-      padding: 4px 12px;
-      border-radius: 8px;
-      border: 1px solid rgba(59, 130, 246, 0.3);
-    }
-
-    .question-count {
-      font-size: 0.9rem;
-      color: #22c55e;
-      background: rgba(34, 197, 94, 0.15);
-      padding: 4px 12px;
-      border-radius: 8px;
-      border: 1px solid rgba(34, 197, 94, 0.3);
-    }
-
-    .topic-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-    }
-
-    .topic-row label {
-      font-size: 0.9rem;
-      color: #d1d5db;
-      white-space: nowrap;
-    }
-
-    .topic-select {
-      background: rgba(15, 23, 42, 0.7);
-      color: #e5e7eb;
-      border-radius: 8px;
-      border: 1px solid rgba(75, 85, 99, 0.9);
-      padding: 8px 12px;
-      font-size: 0.9rem;
-      flex: 1;
-      min-width: 200px;
-    }
-
-    .start-btn {
-      border-radius: 999px;
-      border: none;
-      padding: 8px 16px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      cursor: pointer;
-      background: linear-gradient(to right, #3b82f6, #2563eb);
-      color: white;
-      box-shadow: 0 8px 18px rgba(37, 99, 235, 0.4);
-      white-space: nowrap;
-    }
-
-    .start-btn:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.5);
-    }
-
-    /* RANDOMIZE TOGGLE */
-    .toggle-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.85rem;
-      color: #cbd5f5;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
-    }
-
-    .toggle-row input {
-      transform: scale(1.1);
-      cursor: pointer;
-      accent-color: #3b82f6;
-    }
-
-    .toggle-row label {
-      cursor: pointer;
-    }
-
-    /* QUIZ CONTENT - Updated background to match topic section */
-    .progress {
-      margin-bottom: 16px;
-      font-size: 0.85rem;
-      color: #9ca3af;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .progress-bar {
-      flex: 1;
-      height: 6px;
-      background: rgba(15, 23, 42, 0.7);
-      border-radius: 999px;
-      overflow: hidden;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(to right, #22c55e, #3b82f6);
-      transition: width 0.3s ease;
-    }
-
-    /* QUESTION BOX - Updated background */
-    .question-box {
-      background: rgba(15, 23, 42, 0.7);
-      border-radius: 14px;
-      padding: 14px 14px 10px;
-      border: 1px solid rgba(75, 85, 99, 0.7);
-      margin-bottom: 16px;
-      min-height: 140px;
-    }
-
-    .question-text {
-      font-size: 1rem;
-      font-weight: 500;
-      color: #f9fafb;
-      line-height: 1.5;
-    }
-
-    /* OPTIONS - Updated background */
-    .options {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      display: grid;
-      gap: 8px;
-      margin-top: 10px;
-    }
-
-    .option {
-      background: rgba(15, 23, 42, 0.5);
-      border-radius: 12px;
-      border: 1px solid rgba(75, 85, 99, 0.9);
-      padding: 8px 9px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-      transition: all 0.15s ease, border-color 0.15s ease, transform 0.05s ease;
-      font-size: 0.92rem;
-      color: #e5e7eb;
-    }
-
-    .option:hover {
-      background: rgba(31, 41, 55, 0.9);
-      transform: translateY(-1px);
-    }
-
-    .option input {
-      cursor: pointer;
-      accent-color: #3b82f6;
-    }
-
-    .option.correct {
-      background: rgba(22, 163, 74, 0.25);
-      border-color: #22c55e;
-    }
-
-    .option.incorrect {
-      background: rgba(220, 38, 38, 0.2);
-      border-color: #f97373;
-    }
-
-    .option.disabled {
-      pointer-events: none;
-      opacity: 0.9;
-    }
-
-    .feedback {
-      min-height: 22px;
-      font-size: 0.9rem;
-      margin-top: 6px;
-    }
-
-    .feedback.correct {
-      color: #22c55e;
-    }
-
-    .feedback.incorrect {
-      color: #fb7185;
-    }
-
-    /* TIMER CONTAINER */
-    .timer-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-      padding: 8px 12px;
-      background: rgba(59, 130, 246, 0.1);
-      border-radius: 12px;
-      border: 1px solid rgba(59, 130, 246, 0.2);
-    }
-
-    .timer-label {
-      font-size: 0.85rem;
-      color: #93c5fd;
-    }
-
-    .timer-display {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: #60a5fa;
-      font-family: 'Courier New', monospace;
-      letter-spacing: 1px;
-    }
-
-    .timer-warning {
-      color: #fbbf24;
-      animation: blink 1s infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-
-    .timer-critical {
-      color: #ef4444;
-      animation: pulse 0.5s infinite;
-    }
-
-    .timer-notification {
-      margin-bottom: 10px;
-      padding: 8px 12px;
-      background: rgba(245, 158, 11, 0.1);
-      border-radius: 10px;
-      border: 1px solid rgba(245, 158, 11, 0.3);
-      font-size: 0.85rem;
-      color: #fbbf24;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    /* CONTROLS LAYOUT */
-    .controls {
-      margin-top: 12px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .left-controls {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-start;
-      flex: 1;
-    }
-
-    .right-controls {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-      flex: 1;
-    }
-
-    button {
-      transition: background 0.15s ease, transform 0.05s ease, box-shadow 0.1s ease;
-    }
-
-    #previous-btn {
-      border: none;
-      border-radius: 999px;
-      padding: 8px 18px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      cursor: pointer;
-      background: #1f2937;
-      color: #e5e7eb;
-      border: 1px solid rgba(75, 85, 99, 0.8);
-      min-width: 120px;
-    }
-
-    #previous-btn:hover:enabled {
-      background: #111827;
-    }
-
-    #previous-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    #next-btn {
-      border: none;
-      border-radius: 999px;
-      padding: 8px 18px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      cursor: pointer;
-      background: #1f2937;
-      color: #e5e7eb;
-      border: 1px solid rgba(75, 85, 99, 0.8);
-      min-width: 120px;
-    }
-
-    #next-btn:hover:enabled {
-      background: #111827;
-    }
-
-    #next-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    #submit-btn {
-      border: none;
-      border-radius: 999px;
-      padding: 8px 18px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      cursor: pointer;
-      background: linear-gradient(to right, #22c55e, #16a34a);
-      color: white;
-      box-shadow: 0 8px 18px rgba(34, 197, 94, 0.4);
-      min-width: 120px;
-    }
-
-    #submit-btn:hover:enabled {
-      transform: translateY(-1px);
-      box-shadow: 0 10px 22px rgba(34, 197, 94, 0.5);
-    }
-
-    #submit-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    #finish-btn {
-      border: none;
-      border-radius: 999px;
-      padding: 8px 18px;
-      font-size: 0.9rem;
-      font-weight: 500;
-      cursor: pointer;
-      background: linear-gradient(to right, #f59e0b, #d97706);
-      color: white;
-      box-shadow: 0 8px 18px rgba(245, 158, 11, 0.4);
-      min-width: 120px;
-    }
-
-    #finish-btn:hover:enabled {
-      transform: translateY(-1px);
-      box-shadow: 0 10px 22px rgba(245, 158, 11, 0.5);
-    }
-
-    #finish-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-
-    .score-box {
-      margin-top: 10px;
-      font-size: 0.9rem;
-      color: #e5e7eb;
-    }
-
-    /* UPDATED FINAL SCORE STYLES */
-    .final-score {
-      margin-top: 10px;
-      padding: 20px;
-      border-radius: 14px;
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid rgba(75, 85, 99, 0.7);
-      font-size: 0.95rem;
-    }
-
-    .result-header {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: #3b82f6;
-      margin-bottom: 15px;
-      text-align: center;
-      border-bottom: 1px solid rgba(75, 85, 99, 0.5);
-      padding-bottom: 10px;
-    }
-
-    .result-stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 12px;
-      margin-bottom: 15px;
-    }
-
-    .stat-item {
-      padding: 10px;
-      border-radius: 8px;
-      background: rgba(2, 6, 23, 0.5);
-      border: 1px solid rgba(75, 85, 99, 0.5);
-    }
-
-    .stat-label {
-      font-size: 0.85rem;
-      color: #9ca3af;
-      margin-bottom: 4px;
-    }
-
-    .stat-value {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #e5e7eb;
-    }
-
-    .stat-percentage {
-      color: #22c55e;
-    }
-
-    .stat-time {
-      color: #f59e0b;
-    }
-
-    .result-summary {
-      margin-top: 15px;
-      padding: 15px;
-      border-radius: 10px;
-      background: rgba(2, 6, 23, 0.5);
-      border: 1px solid rgba(75, 85, 99, 0.5);
-      text-align: center;
-      font-size: 0.9rem;
-      color: #9ca3af;
-    }
-
-    .result-message {
-      font-size: 1rem;
-      color: #e5e7eb;
-      margin-top: 10px;
-      padding: 10px;
-      border-radius: 8px;
-      background: rgba(59, 130, 246, 0.1);
-      border: 1px solid rgba(59, 130, 246, 0.2);
-    }
-
-    .loading-spinner {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(59, 130, 246, 0.3);
-      border-radius: 50%;
-      border-top-color: #3b82f6;
-      animation: spin 1s ease-in-out infinite;
-      margin-right: 8px;
-    }
-
-    /* RESPONSIVE STYLES */
-    @media (max-width: 700px) {
-      body {
-        padding: 0;
-        justify-content: flex-start;
-      }
-      
-      .fixed-header {
-        padding: 8px 12px;
-      }
-      
-      .header-title {
-        font-size: 1.1rem;
-      }
-      
-      .header-subtitle {
-        font-size: 0.7rem;
-      }
-      
-      .header-bottom {
-        gap: 10px;
-      }
-      
-      .user-info {
-        font-size: 0.75rem;
-        padding: 4px 10px;
-        max-width: 150px;
-      }
-      
-      .logout-btn {
-        font-size: 0.75rem;
-        padding: 4px 10px;
-      }
-      
-      .main-content {
-        margin-top: 95px;
-        padding: 12px;
-        gap: 15px;
-      }
-      
-      .quiz-container {
-        padding: 15px;
-        border-radius: 14px;
-      }
-      
-      .login-box {
-        padding: 20px;
-        margin: 0 12px;
-      }
-      
-      .login-title {
-        font-size: 1.3rem;
-      }
-      
-      .controls {
-        flex-direction: column;
-        gap: 8px;
-      }
-      
-      .left-controls, .right-controls {
-        width: 100%;
-        justify-content: center;
-      }
-      
-      button {
-        flex: 1;
-        min-width: 0;
-        font-size: 0.85rem;
-        padding: 8px 12px;
-      }
-      
-      .topic-info {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-      }
-      
-      .topic-name, .question-count {
-        width: 100%;
-        text-align: center;
-        font-size: 0.9rem;
-      }
-      
-      .topic-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-      }
-      
-      .topic-row label {
-        text-align: center;
-      }
-      
-      .topic-row .topic-select,
-      .topic-row .start-btn {
-        width: 100%;
-      }
-      
-      .topic-select {
-        min-width: 0;
-        width: 100%;
-      }
-      
-      .start-btn {
-        width: 100%;
-      }
-      
-      .timer-container {
-        flex-direction: column;
-        gap: 5px;
-        align-items: flex-start;
-      }
-      
-      .timer-display {
-        font-size: 1rem;
-      }
-      
-      .question-box {
-        padding: 12px;
-        min-height: 120px;
-      }
-      
-      .question-text {
-        font-size: 0.95rem;
-      }
-      
-      .option {
-        padding: 7px 8px;
-        font-size: 0.9rem;
-      }
-      
-      .login-footer {
-        flex-direction: column;
-        gap: 10px;
-        text-align: center;
-      }
-      
-      .result-stats {
-        grid-template-columns: 1fr;
-      }
-      
-      .stat-item {
-        padding: 8px;
-      }
-      
-      .final-score {
-        padding: 15px;
-      }
-      
-      .result-header {
-        font-size: 1.1rem;
-      }
-    }
-
-    @media (min-width: 701px) {
-      body {
-        padding: 0;
-      }
-      
-      .main-content {
-        margin: 90px auto 20px;
-        padding: 20px;
-      }
-      
-      .header-title {
-        font-size: 1.4rem;
-      }
-      
-      .header-subtitle {
-        font-size: 0.85rem;
-      }
-    }
-    
-    /* For very small screens */
-    @media (max-width: 400px) {
-      .header-title {
-        font-size: 1rem;
-      }
-      
-      .header-subtitle {
-        font-size: 0.65rem;
-      }
-      
-      .user-info {
-        max-width: 120px;
-        font-size: 0.7rem;
-        padding: 3px 8px;
-      }
-      
-      .logout-btn {
-        font-size: 0.7rem;
-        padding: 3px 8px;
-      }
-      
-      .main-content {
-        padding: 10px;
-      }
-      
-      .quiz-container {
-        padding: 12px;
-      }
-      
-      .login-box {
-        padding: 15px;
-      }
-      
-      .header-bottom {
-        flex-wrap: wrap;
-        justify-content: space-around;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPO / LDCE (JE Examination)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        /* Quiz Header */
+        .quiz-header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 3px solid #e74c3c;
+        }
+
+        .quiz-title {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+
+        .quiz-title h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        .quiz-title p {
+            font-size: 14px;
+            color: #ecf0f1;
+            font-style: italic;
+        }
+
+        .quiz-info-row {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 20px;
+            flex: 1;
+        }
+
+        .time-remaining {
+            background-color: #e74c3c;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            font-size: 18px;
+            white-space: nowrap;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .quiz-progress {
+            font-size: 16px;
+            white-space: nowrap;
+            color: #ecf0f1;
+        }
+
+        .quiz-controls {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 15px;
+            justify-content: flex-end;
+        }
+
+        .randomize-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #ecf0f1;
+        }
+
+        .randomize-checkbox input {
+            width: 16px;
+            height: 16px;
+        }
+
+        .logout-button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            height: auto;
+            min-height: 36px;
+            width: auto;
+            min-width: 80px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .logout-button:hover {
+            background-color: #c0392b;
+            transform: translateY(-2px);
+        }
+
+        /* Timer Info */
+        .timer-info {
+            background-color: #f8f9fa;
+            padding: 10px 20px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        /* Question Container */
+        .question-container {
+            padding: 25px;
+        }
+
+        .question-number {
+            color: #2c3e50;
+            font-size: 14px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            line-height: 1.4;
+        }
+
+        /* Options */
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            background-color: #f8f9fa;
+        }
+
+        .option:hover {
+            background-color: #e9ecef;
+            border-color: #3498db;
+        }
+
+        .option.selected {
+            background-color: #d6eaf8;
+            border-color: #3498db;
+            font-weight: bold;
+        }
+
+        .option.correct {
+            background-color: #d4edda;
+            border-color: #28a745;
+        }
+
+        .option.incorrect {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+        }
+
+        /* Navigation Buttons */
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 25px;
+            border-top: 1px solid #eee;
+            margin-top: 20px;
+        }
+
+        .nav-button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .prev-button {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .prev-button:hover {
+            background-color: #7f8c8d;
+        }
+
+        .next-button {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .next-button:hover {
+            background-color: #2980b9;
+        }
+
+        .submit-button {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .submit-button:hover {
+            background-color: #27ae60;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .quiz-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 15px;
+            }
+            
+            .quiz-info-row {
+                justify-content: space-between;
+                margin-bottom: 5px;
+            }
+            
+            .quiz-controls {
+                justify-content: space-between;
+                width: 100%;
+            }
+            
+            .logout-button {
+                align-self: flex-end;
+                width: fit-content;
+            }
+            
+            .time-remaining {
+                font-size: 16px;
+                padding: 6px 12px;
+            }
+            
+            .quiz-progress {
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .quiz-title h1 {
+                font-size: 20px;
+            }
+            
+            .quiz-info-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .quiz-controls {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .logout-button {
+                align-self: stretch;
+                width: 100%;
+            }
+            
+            .question-text {
+                font-size: 18px;
+            }
+            
+            .option {
+                padding: 12px;
+                font-size: 15px;
+            }
+            
+            .nav-button {
+                padding: 10px 20px;
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .quiz-title h1 {
+                font-size: 18px;
+            }
+            
+            .time-remaining, .quiz-progress {
+                font-size: 14px;
+            }
+            
+            .question-text {
+                font-size: 16px;
+            }
+            
+            .nav-button {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: #7f8c8d;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <!-- Fixed Header -->
-  <div class="fixed-header" style="display: none;">
-    <div class="header-content">
-      <div class="header-top">
-        <div class="header-center">
-          <div class="header-title">DPQ / LDCE (JE Examination)</div>
-          <div class="header-subtitle">Created by Gobind Sharma</div>
-        </div>
-      </div>
-      <div class="header-bottom">
-        <div class="user-info" id="header-user-info" style="display: none;">
-          👤 <span id="header-username">Guest</span>
-        </div>
-        <button class="logout-btn" id="header-logout-btn" style="display: none;">
-          🚪 Logout
-        </button>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Main Content Area -->
-  <div class="main-content">
-    <!-- Login Container (shown by default) -->
-    <div id="login-container"></div>
-    
-    <!-- Quiz Container (hidden by default, shown after login) -->
-    <div class="quiz-container">
-      <!-- TOPIC SELECTION SECTION -->
-      <div class="topic-section">
-        <div class="topic-info">
-          <div class="topic-name" id="quiz-topic-name">No topic selected</div>
-          <div class="question-count" id="quiz-question-count">0 questions</div>
-        </div>
-        
-        <div class="topic-row">
-          <label for="topic-select">Select Topic:</label>
-          <select id="topic-select" class="topic-select">
-            <option value="">Loading topics...</option>
-          </select>
-          <button class="start-btn" id="start-btn" disabled>Load Topic</button>
-        </div>
-      </div>
-
-      <!-- Timer Container -->
-      <div id="timer-container" class="timer-container" style="display: none;">
-        <div class="timer-label">⏰ Time Remaining:</div>
-        <div id="timer-display" class="timer-display">00:00:00</div>
-      </div>
-
-      <!-- RANDOMIZE TOGGLE -->
-      <div class="toggle-row">
-        <input type="checkbox" id="random-toggle" checked />
-        <label for="random-toggle">Randomize questions & options</label>
-      </div>
-
-      <div class="progress">
-        <div id="question-counter">Select a topic and click Load Topic</div>
-        <div class="progress-bar">
-          <div id="progress-bar-fill" class="progress-bar-fill"></div>
-        </div>
-        <div id="score-mini">Score: 0</div>
-      </div>
-
-      <div class="question-box">
-        <div id="question-text" class="question-text">
-          Please login to access the quiz.
-        </div>
-        <ul id="options-list" class="options"></ul>
-        <div id="feedback" class="feedback"></div>
-      </div>
-
-      <!-- BUTTON LAYOUT -->
-      <div class="controls">
-        <div class="left-controls">
-          <button id="previous-btn" disabled>← Previous</button>
-          <button id="next-btn" disabled>Next →</button>
-        </div>
-        <div class="right-controls">
-          <button id="submit-btn" disabled>Submit</button>
-          <button id="finish-btn" disabled>Finish</button>
-        </div>
-      </div>
-
-      <div class="score-box">
-        <div id="final-score" class="final-score" style="display:none;"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Load login system first -->
-  <script>
-    // ========= LOGIN SYSTEM =========
-    const LOGIN_SHEET_GID = "1362508814";
-    const BASE_SHEET_ID = "1hJSzOmZZilf3XR4SxlM-s_xPoq-4KkQKJ9vF8TGxSn4";
-
-    class QuizLogin {
-        constructor() {
-            this.isAuthenticated = false;
-            this.currentUser = null;
-            this.loginAttempts = 0;
-            this.maxAttempts = 3;
-            this.lockDuration = 30000;
+    <div class="container">
+        <div class="quiz-header">
+            <div class="quiz-title">
+                <h1>DPO / LDCE (JE Examination)</h1>
+                <p>Created by Gobind Sharma</p>
+                <h2>ICF Coach</h2>
+            </div>
             
-            this.fixedHeader = null;
-            this.headerUserInfoEl = null;
-            this.headerUsernameEl = null;
-            this.headerLogoutBtn = null;
-            this.loginContainer = null;
-            this.quizContainer = null;
-            this.loginForm = null;
-            this.usernameInput = null;
-            this.passwordInput = null;
-            this.loginBtn = null;
-            this.errorMsg = null;
-            this.lockedUntil = null;
-            
-            this.init();
-        }
-
-        init() {
-            this.createLoginUI();
-            this.checkSession();
-            this.attachEventListeners();
-        }
-
-        createLoginUI() {
-            // Create login container
-            this.loginContainer = document.createElement('div');
-            this.loginContainer.id = 'login-container';
-            this.loginContainer.innerHTML = `
-                <div class="login-box">
-                    <div class="login-header">
-                        <div class="login-title">🔐 JE DPQ / LDCE Login</div>
-                        <div class="login-subtitle">Created by Gobind Sharma</div>
-                    </div>
-                    
-                    <form id="login-form" class="login-form">
-                        <div class="form-group">
-                            <label for="username">Username</label>
-                            <input type="text" id="username" name="username" required 
-                                   placeholder="Enter your username" autocomplete="username">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="password">Password</label>
-                            <div class="password-wrapper">
-                                <input type="password" id="password" name="password" required 
-                                       placeholder="Enter your password" autocomplete="current-password">
-                                <button type="button" class="toggle-password" id="toggle-password">👁️</button>
-                            </div>
-                        </div>
-                        
-                        <div id="login-error" class="error-message"></div>
-                        
-                        <div class="form-group">
-                            <button type="submit" id="login-btn" class="login-btn">
-                                <span class="btn-text">Login</span>
-                                <span class="btn-loader" style="display: none;">
-                                    <div class="spinner"></div> Verifying...
-                                </span>
-                            </button>
-                        </div>
-                    </form>
-                    
-                    <div class="login-footer">
-                        <div class="attempts-counter" id="attempts-counter">
-                            Attempts: <span id="attempts-count">0</span>/3
-                        </div>
-                    </div>
-                    
-                    <div id="locked-message" class="locked-message" style="display: none;">
-                        ⚠️ Account locked. Try again in <span id="lock-timer">30</span> seconds
-                    </div>
+            <div class="quiz-info-row">
+                <div class="time-remaining">
+                    Time Remaining: 00:44:38
                 </div>
-            `;
-
-            // Get existing containers
-            this.quizContainer = document.querySelector('.quiz-container');
-            this.fixedHeader = document.querySelector('.fixed-header');
+                <div class="quiz-progress">
+                    Question 1 / 50 | Score: 0
+                </div>
+            </div>
             
-            // Insert login container into main content
-            const mainContent = document.querySelector('.main-content');
-            mainContent.insertBefore(this.loginContainer, this.quizContainer);
-
-            // Cache DOM elements
-            this.loginForm = document.getElementById('login-form');
-            this.usernameInput = document.getElementById('username');
-            this.passwordInput = document.getElementById('password');
-            this.loginBtn = document.getElementById('login-btn');
-            this.errorMsg = document.getElementById('login-error');
-            this.attemptsCount = document.getElementById('attempts-count');
-            this.togglePasswordBtn = document.getElementById('toggle-password');
-            this.lockedMessage = document.getElementById('locked-message');
-            this.lockTimer = document.getElementById('lock-timer');
+            <div class="quiz-controls">
+                <label class="randomize-checkbox">
+                    <input type="checkbox"> Randomize questions & options
+                </label>
+                <button class="logout-button">Logout</button>
+            </div>
+        </div>
+        
+        <div class="timer-info">
+            <p>Timer set: 45 minutes for this quiz</p>
+        </div>
+        
+        <div class="question-container">
+            <div class="question-number">Question 1 / 50</div>
+            <div class="question-text">Brake cylinder piston stroke in EMPTY condition for ICF coach is:</div>
             
-            // Get header elements
-            this.headerUserInfoEl = document.getElementById('header-user-info');
-            this.headerUsernameEl = document.getElementById('header-username');
-            this.headerLogoutBtn = document.getElementById('header-logout-btn');
-        }
+            <div class="options-container">
+                <div class="option">75 ±10 mm</div>
+                <div class="option">85 ±10 mm</div>
+                <div class="option">60 ±10 mm</div>
+                <div class="option selected">130 ±10 mm</div>
+            </div>
+        </div>
+        
+        <div class="navigation-buttons">
+            <button class="nav-button prev-button">Previous</button>
+            <button class="nav-button next-button">Next Question</button>
+        </div>
+        
+        <div class="footer">
+            ICF Coach Examination System
+        </div>
+    </div>
 
-        attachEventListeners() {
-            // Login form submission
-            this.loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                this.handleLogin();
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Option selection
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove selected class from all options
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    
+                    // Add selected class to clicked option
+                    this.classList.add('selected');
+                });
             });
-
-            // Toggle password visibility
-            this.togglePasswordBtn.addEventListener('click', () => {
-                const type = this.passwordInput.type === 'password' ? 'text' : 'password';
-                this.passwordInput.type = type;
-                this.togglePasswordBtn.textContent = type === 'password' ? '👁️' : '👁️‍🗨️';
+            
+            // Logout button
+            const logoutButton = document.querySelector('.logout-button');
+            logoutButton.addEventListener('click', function() {
+                if (confirm('Are you sure you want to logout?')) {
+                    alert('Logged out successfully!');
+                    // In a real app, you would redirect to logout page
+                    // window.location.href = '/logout';
+                }
             });
-
-            // Clear error on input
-            this.usernameInput.addEventListener('input', () => this.clearError());
-            this.passwordInput.addEventListener('input', () => this.clearError());
-
-            // Add logout button event listener
-            if (this.headerLogoutBtn) {
-                this.headerLogoutBtn.addEventListener('click', () => this.handleLogout());
-            }
-        }
-
-        async handleLogin() {
-            // Check if account is locked
-            if (this.lockedUntil && Date.now() < this.lockedUntil) {
-                const remaining = Math.ceil((this.lockedUntil - Date.now()) / 1000);
-                this.showError(`Account locked. Try again in ${remaining} seconds.`);
-                this.showLockedMessage(remaining);
-                return;
-            }
-
-            const username = this.usernameInput.value.trim();
-            const password = this.passwordInput.value.trim();
-
-            if (!username || !password) {
-                this.showError('Please enter both username and password');
-                return;
-            }
-
-            // Show loading state
-            this.setLoading(true);
-
-            try {
-                const isValid = await this.validateCredentials(username, password);
+            
+            // Navigation buttons
+            const prevButton = document.querySelector('.prev-button');
+            const nextButton = document.querySelector('.next-button');
+            
+            prevButton.addEventListener('click', function() {
+                alert('Previous question would load here.');
+            });
+            
+            nextButton.addEventListener('click', function() {
+                alert('Next question would load here.');
+            });
+            
+            // Timer simulation (countdown)
+            let timeRemaining = 44 * 60 + 38; // 44 minutes and 38 seconds in seconds
+            const timeElement = document.querySelector('.time-remaining');
+            
+            function updateTimer() {
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
                 
-                if (isValid) {
-                    // Login successful
-                    this.loginAttempts = 0;
-                    this.isAuthenticated = true;
-                    this.currentUser = username;
-                    
-                    // Save session
-                    this.saveSession(username);
-                    
-                    // Show success message
-                    this.showSuccess('Login successful! Redirecting...');
-                    
-                    // Switch to quiz after delay
-                    setTimeout(() => {
-                        this.showQuiz();
-                    }, 1000);
+                timeElement.textContent = `Time Remaining: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (timeRemaining > 0) {
+                    timeRemaining--;
                 } else {
-                    // Login failed
-                    this.loginAttempts++;
-                    this.attemptsCount.textContent = this.loginAttempts;
-                    
-                    if (this.loginAttempts >= this.maxAttempts) {
-                        // Lock account
-                        this.lockedUntil = Date.now() + this.lockDuration;
-                        this.showError(`Too many failed attempts. Account locked for 30 seconds.`);
-                        this.showLockedMessage(30);
-                        
-                        // Start lock timer
-                        this.startLockTimer();
-                    } else {
-                        this.showError(`Invalid credentials. Attempts: ${this.loginAttempts}/${this.maxAttempts}`);
-                    }
-                }
-            } catch (error) {
-                console.error('Login error:', error);
-                this.showError('Network error. Please check your connection.');
-            } finally {
-                this.setLoading(false);
-            }
-        }
-
-        async validateCredentials(username, password) {
-            try {
-                // Fetch login credentials from Google Sheet
-                const url = `https://docs.google.com/spreadsheets/d/${BASE_SHEET_ID}/export?format=csv&gid=${LOGIN_SHEET_GID}`;
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error('Failed to fetch credentials');
-                }
-                
-                const csvText = await response.text();
-                const credentials = this.parseCredentialsCSV(csvText);
-                
-                // Check if username and password match
-                return credentials.some(cred => 
-                    cred.username === username && cred.password === password
-                );
-            } catch (error) {
-                console.error('Error validating credentials:', error);
-                
-                // Fallback: Check against demo credentials if sheet fails
-                const demoCredentials = [
-                    { username: 'User1', password: 'Pass123' },
-                    { username: 'User2', password: 'Pass456' },
-                    { username: 'Admin', password: 'Admin123' }
-                ];
-                
-                return demoCredentials.some(cred => 
-                    cred.username === username && cred.password === password
-                );
-            }
-        }
-
-        parseCredentialsCSV(csvText) {
-            const lines = csvText.trim().split('\n');
-            const credentials = [];
-            
-            // Skip header row
-            for (let i = 1; i < lines.length; i++) {
-                const row = lines[i].split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
-                
-                if (row.length >= 2) {
-                    const username = row[0] ? row[0].replace(/^"|"$/g, '').trim() : '';
-                    const password = row[1] ? row[1].replace(/^"|"$/g, '').trim() : '';
-                    
-                    if (username && password) {
-                        credentials.push({ username, password });
-                    }
+                    clearInterval(timerInterval);
+                    alert('Time is up! The quiz will be submitted automatically.');
                 }
             }
             
-            return credentials;
-        }
-
-        showQuiz() {
-            this.loginContainer.style.display = 'none';
-            this.fixedHeader.style.display = 'block';
-            this.quizContainer.style.display = 'block';
-            
-            // Update the header with logged in user
-            if (this.headerUserInfoEl && this.headerUsernameEl) {
-                this.headerUserInfoEl.style.display = 'block';
-                this.headerUsernameEl.textContent = this.currentUser;
-                this.headerLogoutBtn.style.display = 'block';
-            }
-            
-            // Initialize quiz
-            if (window.initializeApp) {
-                window.initializeApp();
-            }
-        }
-
-        handleLogout() {
-            if (confirm('Are you sure you want to logout?')) {
-                this.isAuthenticated = false;
-                this.currentUser = null;
-                
-                // Clear session
-                this.clearSession();
-                
-                // Reset login form
-                this.loginForm.reset();
-                this.loginAttempts = 0;
-                this.attemptsCount.textContent = '0';
-                this.clearError();
-                this.hideLockedMessage();
-                
-                // Hide fixed header and quiz, show login
-                this.fixedHeader.style.display = 'none';
-                this.quizContainer.style.display = 'none';
-                this.loginContainer.style.display = 'block';
-                
-                // Reset header display
-                if (this.headerUserInfoEl) {
-                    this.headerUserInfoEl.style.display = 'none';
-                }
-                if (this.headerLogoutBtn) {
-                    this.headerLogoutBtn.style.display = 'none';
-                }
-                
-                // Reset quiz state
-                if (window.resetQuizState) {
-                    window.resetQuizState();
-                }
-            }
-        }
-
-        saveSession(username) {
-            const session = {
-                username,
-                timestamp: Date.now(),
-                expires: Date.now() + (24 * 60 * 60 * 1000) // 24 hours
-            };
-            localStorage.setItem('cwje_quiz_session', JSON.stringify(session));
-        }
-
-        checkSession() {
-            try {
-                const sessionStr = localStorage.getItem('cwje_quiz_session');
-                if (sessionStr) {
-                    const session = JSON.parse(sessionStr);
-                    
-                    if (session.expires > Date.now()) {
-                        // Session is valid
-                        this.isAuthenticated = true;
-                        this.currentUser = session.username;
-                        
-                        // Update header with logged in user
-                        if (this.headerUserInfoEl && this.headerUsernameEl) {
-                            this.headerUserInfoEl.style.display = 'block';
-                            this.headerUsernameEl.textContent = this.currentUser;
-                            this.headerLogoutBtn.style.display = 'block';
-                        }
-                        
-                        this.showQuiz();
-                    } else {
-                        // Session expired
-                        this.clearSession();
-                    }
-                }
-            } catch (error) {
-                console.error('Error checking session:', error);
-                this.clearSession();
-            }
-        }
-
-        clearSession() {
-            localStorage.removeItem('cwje_quiz_session');
-        }
-
-        showError(message) {
-            this.errorMsg.textContent = message;
-            this.errorMsg.style.display = 'block';
-            
-            // Shake animation for error
-            this.loginForm.classList.add('shake');
-            setTimeout(() => {
-                this.loginForm.classList.remove('shake');
-            }, 500);
-        }
-
-        showSuccess(message) {
-            this.errorMsg.textContent = message;
-            this.errorMsg.style.color = '#22c55e';
-            this.errorMsg.style.display = 'block';
-        }
-
-        clearError() {
-            this.errorMsg.textContent = '';
-            this.errorMsg.style.display = 'none';
-            this.errorMsg.style.color = '#ef4444';
-        }
-
-        setLoading(isLoading) {
-            const btnText = this.loginBtn.querySelector('.btn-text');
-            const btnLoader = this.loginBtn.querySelector('.btn-loader');
-            
-            if (isLoading) {
-                btnText.style.display = 'none';
-                btnLoader.style.display = 'inline-flex';
-                this.loginBtn.disabled = true;
-            } else {
-                btnText.style.display = 'inline';
-                btnLoader.style.display = 'none';
-                this.loginBtn.disabled = false;
-            }
-        }
-
-        showLockedMessage(seconds) {
-            this.lockedMessage.style.display = 'block';
-            this.lockTimer.textContent = seconds;
-            this.loginForm.style.display = 'none';
-        }
-
-        hideLockedMessage() {
-            this.lockedMessage.style.display = 'none';
-            this.loginForm.style.display = 'block';
-        }
-
-        startLockTimer() {
-            const updateTimer = () => {
-                const remaining = Math.ceil((this.lockedUntil - Date.now()) / 1000);
-                
-                if (remaining > 0) {
-                    this.lockTimer.textContent = remaining;
-                    setTimeout(updateTimer, 1000);
-                } else {
-                    // Lock expired
-                    this.hideLockedMessage();
-                    this.lockedUntil = null;
-                    this.loginAttempts = 0;
-                    this.attemptsCount.textContent = '0';
-                    this.clearError();
-                }
-            };
-            
-            updateTimer();
-        }
-    }
-  </script>
-  
-  <!-- Then load the quiz logic -->
-  <script>
-    // ========= GLOBAL VARIABLES =========
-    let topicsData = null;
-    let BASE_ID = "1hJSzOmZZilf3XR4SxlM-s_xPoq-4KkQKJ9vF8TGxSn4";
-    let TOPICS = {};
-
-    let questions = [];
-    let currentIndex = 0;
-    let score = 0;
-    let hasAnswered = false;
-    let questionsLoaded = false;
-    let currentTopicKey = null;
-    let userAnswers = [];
-    let topicTimeLimit = 0;
-    let timeRemaining = 0;
-    let timerInterval = null;
-    let timeLimitSet = false;
-    let timerNotification = null;
-    let quizStartTime = null;
-
-    const questionTextEl    = document.getElementById("question-text");
-    const optionsListEl     = document.getElementById("options-list");
-    const feedbackEl        = document.getElementById("feedback");
-    const submitBtn         = document.getElementById("submit-btn");
-    const nextBtn           = document.getElementById("next-btn");
-    const previousBtn       = document.getElementById("previous-btn");
-    const finishBtn         = document.getElementById("finish-btn");
-    const questionCounterEl = document.getElementById("question-counter");
-    const progressBarFillEl = document.getElementById("progress-bar-fill");
-    const scoreMiniEl       = document.getElementById("score-mini");
-    const finalScoreEl      = document.getElementById("final-score");
-    const topicSelectEl     = document.getElementById("topic-select");
-    const startBtnEl        = document.getElementById("start-btn");
-    const timerContainerEl  = document.getElementById("timer-container");
-    const timerDisplayEl    = document.getElementById("timer-display");
-    const randomToggleEl    = document.getElementById("random-toggle");
-    const quizTopicNameEl   = document.getElementById("quiz-topic-name");
-    const quizQuestionCountEl = document.getElementById("quiz-question-count");
-
-    // Function to reset quiz state (used by logout)
-    window.resetQuizState = function() {
-      questions = [];
-      currentIndex = 0;
-      score = 0;
-      hasAnswered = false;
-      questionsLoaded = false;
-      currentTopicKey = null;
-      userAnswers = [];
-      topicTimeLimit = 0;
-      timeRemaining = 0;
-      timeLimitSet = false;
-      quizStartTime = null;
-      
-      // Stop any running timer
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-      
-      // Reset UI
-      topicSelectEl.innerHTML = '<option value="">-- Choose Topic --</option>';
-      topicSelectEl.disabled = false;
-      startBtnEl.disabled = false;
-      questionTextEl.textContent = "Please login to access the quiz.";
-      optionsListEl.innerHTML = "";
-      feedbackEl.textContent = "";
-      submitBtn.disabled = true;
-      nextBtn.disabled = true;
-      previousBtn.disabled = true;
-      finishBtn.disabled = true;
-      questionCounterEl.textContent = "Select a topic and click Load Topic";
-      progressBarFillEl.style.width = "0%";
-      scoreMiniEl.textContent = "Score: 0";
-      finalScoreEl.style.display = "none";
-      timerContainerEl.style.display = "none";
-      quizTopicNameEl.textContent = "No topic selected";
-      quizQuestionCountEl.textContent = "0 questions";
-      
-      // Remove timer notification if exists
-      if (timerNotification && timerNotification.parentNode) {
-        timerNotification.parentNode.removeChild(timerNotification);
-        timerNotification = null;
-      }
-    };
-
-    // ---------- Initialize App ----------
-
-    async function initializeApp() {
-      try {
-        // Load topics from JSON file
-        const response = await fetch('topics.json');
-        if (!response.ok) throw new Error('Failed to load topics.json');
-        
-        topicsData = await response.json();
-        BASE_ID = topicsData.base_sheet_id;
-        
-        // Build TOPICS object from JSON data
-        TOPICS = {};
-        topicsData.topics.forEach(topic => {
-          TOPICS[topic.id] = {
-            name: topic.name,
-            url: `https://docs.google.com/spreadsheets/d/${BASE_ID}/export?format=csv&gid=${topic.gid}`
-          };
+            // Update timer every second
+            const timerInterval = setInterval(updateTimer, 1000);
         });
-        
-        // Populate topic dropdown
-        populateTopicDropdown();
-        
-        // Enable start button
-        startBtnEl.disabled = false;
-        
-      } catch (error) {
-        console.error('Error loading topics:', error);
-        topicSelectEl.innerHTML = '<option value="">Error loading topics</option>';
-        questionTextEl.textContent = "Error loading topics. Please check if topics.json file exists.";
-      }
-    }
-
-    function populateTopicDropdown() {
-      topicSelectEl.innerHTML = '<option value="">-- Choose Topic --</option>';
-      
-      topicsData.topics.forEach(topic => {
-        const option = document.createElement('option');
-        option.value = topic.id;
-        option.textContent = topic.name;
-        topicSelectEl.appendChild(option);
-      });
-    }
-
-    // ---------- Timer Functions ----------
-
-    function startTopicTimer() {
-      if (!timeLimitSet || topicTimeLimit <= 0) return;
-      
-      timeRemaining = topicTimeLimit * 60 * 1000;
-      timerContainerEl.style.display = "flex";
-      
-      updateTimerDisplay();
-      
-      timerInterval = setInterval(() => {
-        timeRemaining -= 1000;
-        
-        if (timeRemaining <= 0) {
-          timeRemaining = 0;
-          clearInterval(timerInterval);
-          autoFinishQuiz();
-        }
-        
-        updateTimerDisplay();
-      }, 1000);
-    }
-
-    function updateTimerDisplay() {
-      const hours = Math.floor(timeRemaining / (1000 * 60 * 60));
-      const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-      
-      const formattedTime = 
-        `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-      
-      timerDisplayEl.textContent = formattedTime;
-      
-      updateTimerLabel(hours, minutes);
-      
-      timerDisplayEl.classList.remove("timer-warning", "timer-critical");
-      
-      const warningThreshold = topicTimeLimit * 60 * 1000 * 0.25;
-      
-      if (timeRemaining <= warningThreshold && timeRemaining > 0) {
-        timerDisplayEl.classList.add("timer-warning");
-      }
-      
-      const criticalThreshold = Math.min(topicTimeLimit * 60 * 1000 * 0.10, 5 * 60 * 1000);
-      
-      if (timeRemaining <= criticalThreshold && timeRemaining > 0) {
-        timerDisplayEl.classList.add("timer-critical");
-      }
-    }
-
-    function updateTimerLabel(hours, minutes) {
-      const timerLabel = timerContainerEl.querySelector('.timer-label');
-      const totalMinutes = hours * 60 + minutes;
-      
-      if (totalMinutes <= 5) {
-        timerLabel.textContent = "⏰ Hurry! Time almost up:";
-        timerLabel.style.color = "#f87171";
-      } else if (totalMinutes <= 15) {
-        timerLabel.textContent = "⏰ Time running out:";
-        timerLabel.style.color = "#fbbf24";
-      } else {
-        timerLabel.textContent = "⏰ Time Remaining:";
-        timerLabel.style.color = "#93c5fd";
-      }
-    }
-
-    function stopTimer() {
-      if (timerInterval) {
-        clearInterval(timerInterval);
-        timerInterval = null;
-      }
-      timerContainerEl.style.display = "none";
-    }
-
-    function showTimerNotification() {
-      removeTimerNotification();
-      
-      if (timeLimitSet && topicTimeLimit > 0) {
-        timerNotification = document.createElement("div");
-        timerNotification.className = "timer-notification";
-        timerNotification.innerHTML = `
-          <span>⏰</span>
-          <span>Timer set: <strong>${topicTimeLimit} minutes</strong> for this quiz</span>
-        `;
-        
-        const questionBox = document.querySelector(".question-box");
-        questionBox.parentNode.insertBefore(timerNotification, questionBox);
-      }
-    }
-
-    function removeTimerNotification() {
-      if (timerNotification && timerNotification.parentNode) {
-        timerNotification.parentNode.removeChild(timerNotification);
-        timerNotification = null;
-      }
-      
-      const existingNotifications = document.querySelectorAll(".timer-notification");
-      existingNotifications.forEach(notification => {
-        if (notification.parentNode) {
-          notification.parentNode.removeChild(notification);
-        }
-      });
-    }
-
-    function autoFinishQuiz() {
-      if (!timeLimitSet) return;
-      
-      showFinalResults();
-      stopTimer();
-      removeTimerNotification();
-    }
-
-    // ---------- CSV Parsing & Question Management ----------
-
-    function shuffleArray(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-    }
-
-    function parseCSV(text) {
-      const lines = text.trim().split("\n");
-      const result = [];
-      if (lines.length <= 1) return result;
-
-      const headers = lines[0].toLowerCase().split(',');
-      
-      const questionIndex = headers.findIndex(h => h.includes('question'));
-      const option1Index = headers.findIndex(h => h.includes('option1') || h.includes('option 1'));
-      const option2Index = headers.findIndex(h => h.includes('option2') || h.includes('option 2'));
-      const option3Index = headers.findIndex(h => h.includes('option3') || h.includes('option 3'));
-      const option4Index = headers.findIndex(h => h.includes('option4') || h.includes('option 4'));
-      const correctIndex = headers.findIndex(h => h.includes('correct'));
-      const timeIndex = headers.findIndex(h => h.includes('time'));
-      
-      topicTimeLimit = 0;
-      timeLimitSet = false;
-
-      for (let i = 1; i < lines.length; i++) {
-        const row = lines[i].split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/);
-        
-        if (i === 1 && timeIndex >= 0 && timeIndex < row.length) {
-          const timeValue = row[timeIndex].replace(/^"|"$/g, "").trim();
-          if (timeValue && !isNaN(parseFloat(timeValue))) {
-            topicTimeLimit = parseFloat(timeValue);
-            timeLimitSet = true;
-          }
-        }
-        
-        if (row.length < Math.max(questionIndex, option1Index, option2Index, option3Index, option4Index, correctIndex) + 1) {
-          continue;
-        }
-
-        const q   = row[questionIndex] ? row[questionIndex].replace(/^"|"$/g, "").trim() : "";
-        const o1  = row[option1Index] ? row[option1Index].replace(/^"|"$/g, "").trim() : "";
-        const o2  = row[option2Index] ? row[option2Index].replace(/^"|"$/g, "").trim() : "";
-        const o3  = row[option3Index] ? row[option3Index].replace(/^"|"$/g, "").trim() : "";
-        const o4  = row[option4Index] ? row[option4Index].replace(/^"|"$/g, "").trim() : "";
-        const raw = row[correctIndex] ? row[correctIndex].replace(/^"|"$/g, "").trim() : "";
-
-        if (!q) continue;
-
-        let correctIdx = 0;
-        if (/^[1-4]$/.test(raw)) {
-          correctIdx = parseInt(raw, 10) - 1;
-        } else {
-          const map = { A:0, B:1, C:2, D:3 };
-          correctIdx = map[raw.toUpperCase()] ?? 0;
-        }
-
-        result.push({
-          question: q,
-          options: [o1, o2, o3, o4],
-          correctIndex: correctIdx
-        });
-      }
-      
-      return result;
-    }
-
-    function prepareQuestionBank(rawQuestions) {
-      const qs = rawQuestions.map(q => ({
-        question: q.question,
-        options: [...q.options],
-        correctIndex: q.correctIndex
-      }));
-
-      // Only shuffle questions if random toggle is checked
-      if (randomToggleEl.checked) {
-        shuffleArray(qs);
-        
-        qs.forEach(q => {
-          const idxs = [0, 1, 2, 3];
-          shuffleArray(idxs);
-          const newOptions = idxs.map(i => q.options[i]);
-          const newCorrectIndex = idxs.indexOf(q.correctIndex);
-          q.options = newOptions;
-          q.correctIndex = newCorrectIndex;
-        });
-      }
-
-      return qs;
-    }
-
-    // ---------- UI rendering ----------
-
-    function renderQuestion() {
-      if (!questionsLoaded || questions.length === 0) {
-        questionTextEl.textContent = "No questions available. Check your Google Sheet.";
-        optionsListEl.innerHTML = "";
-        submitBtn.disabled = true;
-        nextBtn.disabled = true;
-        previousBtn.disabled = true;
-        finishBtn.disabled = true;
-        return;
-      }
-
-      const q = questions[currentIndex];
-      hasAnswered = false;
-      feedbackEl.textContent = "";
-      feedbackEl.className = "feedback";
-      finalScoreEl.style.display = "none";
-
-      questionCounterEl.textContent = `Question ${currentIndex + 1} / ${questions.length}`;
-      const progressPercent = (currentIndex / questions.length) * 100;
-      progressBarFillEl.style.width = `${progressPercent}%`;
-
-      questionTextEl.textContent = q.question;
-      optionsListEl.innerHTML = "";
-
-      q.options.forEach((opt, idx) => {
-        const li = document.createElement("li");
-        li.className = "option";
-
-        const input = document.createElement("input");
-        input.type = "radio";
-        input.name = "option";
-        input.value = idx;
-        input.id = `opt-${idx}`;
-
-        if (userAnswers[currentIndex] !== undefined) {
-          input.checked = (userAnswers[currentIndex] === idx);
-        }
-
-        const label = document.createElement("label");
-        label.setAttribute("for", `opt-${idx}`);
-        label.textContent = opt;
-
-        li.appendChild(input);
-        li.appendChild(label);
-        optionsListEl.appendChild(li);
-
-        li.addEventListener("click", () => {
-          const radio = li.querySelector("input");
-          if (radio) {
-            radio.checked = true;
-            userAnswers[currentIndex] = idx;
-          }
-        });
-      });
-
-      submitBtn.disabled = false;
-      submitBtn.textContent = "Submit";
-      previousBtn.disabled = (currentIndex === 0);
-      nextBtn.disabled = false;
-      finishBtn.disabled = false;
-      
-      if (userAnswers[currentIndex] !== undefined) {
-        const selectedIndex = userAnswers[currentIndex];
-        const isCorrect = (selectedIndex === q.correctIndex);
-        
-        showCorrectness(selectedIndex);
-        lockOptions();
-        submitBtn.disabled = true;
-        hasAnswered = true;
-        
-        if (isCorrect) {
-          feedbackEl.textContent = "✅ Correct!";
-          feedbackEl.className = "feedback correct";
-        } else {
-          feedbackEl.textContent = `❌ Wrong. Correct answer: ${q.options[q.correctIndex]}`;
-          feedbackEl.className = "feedback incorrect";
-        }
-      } else {
-        feedbackEl.textContent = "";
-      }
-    }
-
-    function getSelectedOptionIndex() {
-      const radios = document.querySelectorAll("input[name='option']");
-      for (let r of radios) {
-        if (r.checked) return parseInt(r.value, 10);
-      }
-      return -1;
-    }
-
-    function lockOptions() {
-      const optionEls = document.querySelectorAll(".option");
-      optionEls.forEach(opt => {
-        opt.classList.add("disabled");
-        const input = opt.querySelector("input");
-        if (input) input.disabled = true;
-      });
-    }
-
-    function showCorrectness(selectedIndex) {
-      const q = questions[currentIndex];
-      const optionEls = document.querySelectorAll(".option");
-      optionEls.forEach((optEl, idx) => {
-        optEl.classList.remove("correct", "incorrect");
-        if (idx === q.correctIndex) optEl.classList.add("correct");
-        if (idx === selectedIndex && selectedIndex !== q.correctIndex) {
-          optEl.classList.add("incorrect");
-        }
-      });
-    }
-
-    function goToNextQuestion() {
-      if (currentIndex < questions.length - 1) {
-        currentIndex++;
-        renderQuestion();
-      } else {
-        showFinalResults();
-      }
-    }
-
-    function goToPreviousQuestion() {
-      if (currentIndex > 0) {
-        currentIndex--;
-        renderQuestion();
-      }
-    }
-
-    function calculateQuizStats() {
-      let attempted = 0;
-      let correct = 0;
-      
-      for (let i = 0; i < questions.length; i++) {
-        if (userAnswers[i] !== undefined) {
-          attempted++;
-          if (userAnswers[i] === questions[i].correctIndex) {
-            correct++;
-          }
-        }
-      }
-      
-      const percentage = questions.length > 0 ? ((correct / questions.length) * 100).toFixed(2) : 0;
-      
-      return {
-        total: questions.length,
-        attempted,
-        correct,
-        percentage
-      };
-    }
-
-    function formatTimeTaken() {
-      const endTime = Date.now();
-      const timeTaken = endTime - quizStartTime;
-      
-      const hours = Math.floor(timeTaken / (1000 * 60 * 60));
-      const minutes = Math.floor((timeTaken % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((timeTaken % (1000 * 60)) / 1000);
-      
-      if (hours > 0) {
-        return `${hours}h ${minutes}m ${seconds}s`;
-      } else if (minutes > 0) {
-        return `${minutes}m ${seconds}s`;
-      } else {
-        return `${seconds}s`;
-      }
-    }
-
-    function showFinalResults() {
-      stopTimer();
-      removeTimerNotification();
-      
-      const stats = calculateQuizStats();
-      const timeTaken = formatTimeTaken();
-      
-      progressBarFillEl.style.width = "100%";
-      questionTextEl.textContent = "Quiz Completed!";
-      optionsListEl.innerHTML = "";
-      feedbackEl.textContent = "";
-      submitBtn.style.display = "none";
-      nextBtn.style.display = "none";
-      previousBtn.style.display = "none";
-      finishBtn.style.display = "none";
-      finalScoreEl.style.display = "block";
-      
-      let performanceMessage = "";
-      if (stats.percentage >= 80) {
-        performanceMessage = "🎉 Excellent! Outstanding performance!";
-      } else if (stats.percentage >= 60) {
-        performanceMessage = "👍 Good job! Keep practicing!";
-      } else if (stats.percentage >= 40) {
-        performanceMessage = "📚 Keep learning! Review the topics again.";
-      } else {
-        performanceMessage = "📖 Needs improvement. Study the topic thoroughly.";
-      }
-      
-      finalScoreEl.innerHTML = `
-        <div class="result-header">Quiz Results</div>
-        <div class="result-stats">
-          <div class="stat-item">
-            <div class="stat-label">Total Questions</div>
-            <div class="stat-value">${stats.total}</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">Attempted</div>
-            <div class="stat-value">${stats.attempted}/${stats.total}</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">Correct Answers</div>
-            <div class="stat-value">${stats.correct}</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">Score Percentage</div>
-            <div class="stat-value stat-percentage">${stats.percentage}%</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-label">Time Taken</div>
-            <div class="stat-value stat-time">${timeTaken}</div>
-          </div>
-          ${timeLimitSet ? `
-          <div class="stat-item">
-            <div class="stat-label">Time Limit</div>
-            <div class="stat-value">${topicTimeLimit} minutes</div>
-          </div>
-          ` : ''}
-        </div>
-        <div class="result-message">
-          ${performanceMessage}
-        </div>
-        <div class="result-summary">
-          <em>Select a new topic from the dropdown above to start another quiz.</em>
-        </div>
-      `;
-    }
-
-    function resetQuizUI() {
-      topicSelectEl.value = "";
-      quizTopicNameEl.textContent = "No topic selected";
-      quizQuestionCountEl.textContent = "0 questions";
-      questionTextEl.textContent = "Select a topic and start quiz";
-      optionsListEl.innerHTML = "";
-      feedbackEl.textContent = "";
-      submitBtn.style.display = "inline-block";
-      nextBtn.style.display = "inline-block";
-      previousBtn.style.display = "inline-block";
-      finishBtn.style.display = "inline-block";
-      finalScoreEl.style.display = "none";
-      progressBarFillEl.style.width = "0%";
-      questionCounterEl.textContent = "Select a topic and click Load Topic";
-      scoreMiniEl.textContent = "Score: 0";
-      
-      questions = [];
-      currentIndex = 0;
-      score = 0;
-      hasAnswered = false;
-      questionsLoaded = false;
-      currentTopicKey = null;
-      userAnswers = [];
-      topicTimeLimit = 0;
-      timeRemaining = 0;
-      timeLimitSet = false;
-      quizStartTime = null;
-    }
-
-    function restartQuiz() {
-      score = 0;
-      currentIndex = 0;
-      userAnswers = [];
-      scoreMiniEl.textContent = "Score: 0";
-      submitBtn.style.display = "inline-block";
-      nextBtn.style.display = "inline-block";
-      previousBtn.style.display = "inline-block";
-      finishBtn.style.display = "inline-block";
-      finalScoreEl.style.display = "none";
-      
-      if (timeLimitSet && topicTimeLimit > 0) {
-        startTopicTimer();
-        showTimerNotification();
-      }
-      
-      loadQuestionsForTopic(currentTopicKey);
-    }
-
-    // ---------- Question Loading ----------
-
-    async function loadQuestionsForTopic(topicKey) {
-      const topic = TOPICS[topicKey];
-      if (!topic) return;
-
-      try {
-        removeTimerNotification();
-        
-        questionTextEl.textContent = "Loading questions from Google Sheet…";
-        optionsListEl.innerHTML = "";
-        feedbackEl.textContent = "";
-        submitBtn.disabled = true;
-        nextBtn.disabled = true;
-        previousBtn.disabled = true;
-        finishBtn.disabled = true;
-        finalScoreEl.style.display = "none";
-        progressBarFillEl.style.width = "0%";
-        questionCounterEl.textContent = "Loading…";
-
-        timerContainerEl.style.display = "none";
-
-        const res = await fetch(topic.url);
-        if (!res.ok) throw new Error("Network error");
-        const text = await res.text();
-        const parsed = parseCSV(text);
-
-        if (parsed.length === 0) {
-          questionTextEl.textContent = "No questions found in this sheet.";
-          questionsLoaded = false;
-          return;
-        }
-
-        questions = prepareQuestionBank(parsed);
-        userAnswers = new Array(questions.length);
-        quizStartTime = Date.now();
-
-        questionsLoaded = true;
-        currentIndex = 0;
-        score = 0;
-        scoreMiniEl.textContent = "Score: 0";
-        submitBtn.style.display = "inline-block";
-        nextBtn.style.display = "inline-block";
-        previousBtn.style.display = "inline-block";
-        finishBtn.style.display = "inline-block";
-        
-        // Update topic display
-        currentTopicKey = topicKey;
-        quizTopicNameEl.textContent = topic.name;
-        quizQuestionCountEl.textContent = `${questions.length} questions`;
-        
-        if (timeLimitSet && topicTimeLimit > 0) {
-          showTimerNotification();
-          startTopicTimer();
-        }
-        
-        renderQuestion();
-      } catch (err) {
-        console.error(err);
-        questionTextEl.textContent = "Error loading questions. Check CSV link, sharing & internet.";
-        submitBtn.disabled = true;
-        nextBtn.disabled = true;
-        previousBtn.disabled = true;
-        finishBtn.disabled = true;
-      }
-    }
-
-    // ---------- Event Listeners ----------
-
-    submitBtn.addEventListener("click", () => {
-      if (!questionsLoaded || hasAnswered) return;
-
-      const selectedIndex = getSelectedOptionIndex();
-      if (selectedIndex === -1) {
-        alert("Please select an option before submitting.");
-        return;
-      }
-
-      const q = questions[currentIndex];
-      hasAnswered = true;
-      userAnswers[currentIndex] = selectedIndex;
-
-      if (selectedIndex === q.correctIndex) {
-        score++;
-        feedbackEl.textContent = "✅ Correct!";
-        feedbackEl.className = "feedback correct";
-      } else {
-        feedbackEl.textContent = `❌ Wrong. Correct answer: ${q.options[q.correctIndex]}`;
-        feedbackEl.className = "feedback incorrect";
-      }
-
-      scoreMiniEl.textContent = `Score: ${score}`;
-      showCorrectness(selectedIndex);
-      lockOptions();
-      submitBtn.disabled = true;
-
-      if (selectedIndex === q.correctIndex) {
-        nextBtn.disabled = true;
-        setTimeout(() => {
-          nextBtn.disabled = false;
-          goToNextQuestion();
-        }, 700);
-      }
-    });
-
-    nextBtn.addEventListener("click", () => {
-      goToNextQuestion();
-    });
-
-    previousBtn.addEventListener("click", () => {
-      goToPreviousQuestion();
-    });
-
-    finishBtn.addEventListener("click", () => {
-      if (confirm("Are you sure you want to finish the quiz? Your current score will be calculated.")) {
-        showFinalResults();
-      }
-    });
-
-    startBtnEl.addEventListener("click", () => {
-      const key = topicSelectEl.value;
-      if (!key) {
-        alert("Please select a topic first.");
-        return;
-      }
-      
-      stopTimer();
-      removeTimerNotification();
-      
-      currentTopicKey = key;
-      loadQuestionsForTopic(key);
-    });
-
-    // Initialize the app
-    document.addEventListener('DOMContentLoaded', () => {
-      // Initialize login
-      window.quizLogin = new QuizLogin();
-    });
-  </script>
+    </script>
 </body>
 </html>
